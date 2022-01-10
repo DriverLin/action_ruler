@@ -39,14 +39,20 @@ try:
         f.write(bytes)
     cmd = "java -jar {} --aliyundrive.refresh-token={} --server.port=8900 --aliyundrive.auth.enable=false > /dev/null".format(jar_path,refresh_token)
 
-    threading.Thread(target=os.system, args=(cmd,)).start()
+    # threading.Thread(target=os.system, args=(cmd,)).start()
+    os.system(  "nohup {} &".format(cmd))
 
     for i in range(10):
         print("waiting for server start  {}/10".format(i+1))
         time.sleep(1)
 
     os.system("chmod 777 ./rclone")
+
     os.system("./rclone --config ./rclone.conf copy onedrive2: aliyunenc: -P --stats=3s --stats-one-line")
+
+    print("all done!")
+
+    exit()
 
 except Exception as e:
     print(e)
