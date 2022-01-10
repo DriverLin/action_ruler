@@ -1,0 +1,60 @@
+# This is a basic workflow to help you get started with Actions
+name: backp_onedrive
+# Controls when the workflow will run
+on:
+  # watch:
+  #   types: started
+  workflow_dispatch:
+  # schedule:
+  #     - cron: '*/60  * * * *'
+  # Triggers the workflow on push or pull request events but only for the main branch
+  # push:
+  #   branches: [ main ]
+  # pull_request:
+  #   branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab
+  # workflow_dispatch:
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '17'
+          
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+          architecture: 'x64'
+
+      - name: install package
+        run: pip install requests cryptography 
+
+      - name: run main
+        env:
+          KEY: ${{secrets.KEY}}
+          RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
+        run: python main.py
+        working-directory: ./aliyunpan/backup_onedrive
+
+      - name: commit
+        run: |
+          git config --global user.email lty6531600@outlook.com
+          git config --global user.name DriverLin
+          git add .
+          git commit -m "update" -a
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
