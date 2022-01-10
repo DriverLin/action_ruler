@@ -4,6 +4,7 @@ name: CI
 on:
   # watch:
   #   types: started
+  workflow_dispatch:
   schedule:
       - cron: '*/60  * * * *'
   # Triggers the workflow on push or pull request events but only for the main branch
@@ -29,10 +30,14 @@ jobs:
           python-version: '3.8'
           architecture: 'x64'
 
-      - run: |
-          pip install requests cryptography
-          python main.py
+      - name: install package
+        run: pip install requests cryptography 
+
+      - name: run main
+        env:
+          KEY: ${{secrets.KEY}}
         working-directory: ./aliyunpan/auto_refresh
+        run: python main.py
 
       - name: commit
         run: |

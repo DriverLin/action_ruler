@@ -30,7 +30,7 @@ def download_newleast(releaseUrl):
         print(e)
         return None
 try:
-    tokenbin_url = "https://raw.githubusercontent.com/DriverLin/Refresh_token_autorefresh/main/refresh_token.bin"
+    tokenbin_url = "https://raw.githubusercontent.com/DriverLin/action_ruler/main/aliyunpan/auto_refresh/refresh_token.bin"
     response = requests.get(tokenbin_url)
     refresh_token = dec(os.environ.get("KEY") ,response.text)
     jar_path = os.path.join(os.getcwd(), "webdav-aliyundriver.jar")
