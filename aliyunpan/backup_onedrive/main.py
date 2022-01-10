@@ -37,7 +37,7 @@ try:
     bytes = download_newleast("https://api.github.com/repos/zxbu/webdav-aliyundriver/releases/latest")
     with open(jar_path, "wb") as f:
         f.write(bytes)
-    cmd = "java -jar {} --aliyundrive.refresh-token={} --server.port=8900 --aliyundrive.auth.enable=false".format(jar_path,refresh_token)
+    cmd = "java -jar {} --aliyundrive.refresh-token={} --server.port=8900 --aliyundrive.auth.enable=false > /dev/null".format(jar_path,refresh_token)
 
     threading.Thread(target=os.system, args=(cmd,)).start()
 
