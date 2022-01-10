@@ -46,15 +46,3 @@ jobs:
           RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
         run: python main.py
         working-directory: ./aliyunpan/backup_onedrive
-
-      - name: commit
-        run: |
-          git config --global user.email lty6531600@outlook.com
-          git config --global user.name DriverLin
-          git add .
-          git commit -m "update" -a
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -5,7 +5,7 @@ import base64
 import os
 import hashlib
 import threading
-
+import time
 
 def dec(key, data):
     md5hash = hashlib.md5(key.encode()).hexdigest().encode('utf-8')
@@ -41,10 +41,16 @@ try:
 
     threading.Thread(target=os.system, args=(cmd,)).start()
 
+    for i in range(10):
+        print("waiting for server start  {}/10".format(i+1))
+        time.sleep(1)
+
     os.system("chmod 777 ./rclone")
     os.system("./rclone --config ./rclone.conf copy onedrive2: aliyunenc: -P --stats=3s --stats-one-line")
+
 except Exception as e:
     print(e)
+
 exit()
 
 
