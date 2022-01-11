@@ -27,11 +27,11 @@ def getLogger():
 if __name__ == "__main__":
     try:
         logger =  getLogger()
-        token = os.environ.get("TOKEN") | "none/none"
-        tag=os.environ.get("TAG") | "info"
-        title=os.environ.get("TITLE") | "No title"
+        token = os.environ.get("TOKEN") or "none/none"
+        tag=os.environ.get("TAG") or "info"
+        title=os.environ.get("TITLE") or "No title"
 
-        text = os.environ.get("TEXT") | "No text"
+        text = os.environ.get("TEXT") or "No text"
         if os.path.exists("/tmp/msg"):
             text = open("/tmp/msg", "r",encoding="UTF-8").read()
             os.remove("/tmp/msg")
