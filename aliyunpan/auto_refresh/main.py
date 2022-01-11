@@ -6,7 +6,23 @@ import base64
 import os
 import hashlib
 
+import coloredlogs
+import logging
 
+def getLogger():
+    log = logging.getLogger(f'{"main"}:{"loger"}')
+    fmt = f'%(asctime)s.%(msecs)03d .%(levelname)s \t%(message)s'
+    coloredlogs.install(
+        level=logging.DEBUG,
+        logger=log,
+        milliseconds=True,
+        datefmt='%X',
+        fmt=fmt
+    )
+    log.info("Loger initialized")
+    return log
+
+logger = getLogger()
 
 def enc(key, data):
     md5hash = hashlib.md5(key.encode()).hexdigest().encode('utf-8')
@@ -35,7 +51,7 @@ if __name__ == '__main__':
         # print("new_refresh_token: " , new_refresh_token)
         with open("./refresh_token.bin", "w") as f:
             f.write( enc(os.environ.get("KEY"),new_refresh_token))
-        print("refresh token refreshed successfully")
+        logger.info("refresh token refreshed successfully")
     except Exception as e:
-        print("Error: ", e)
+        logger.error(e.__str__())
     

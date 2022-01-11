@@ -7,6 +7,23 @@ import os
 import hashlib
 import threading
 import time
+import coloredlogs
+import logging
+
+def getLogger():
+    log = logging.getLogger(f'{"main"}:{"loger"}')
+    fmt = f'%(asctime)s.%(msecs)03d .%(levelname)s \t%(message)s'
+    coloredlogs.install(
+        level=logging.DEBUG,
+        logger=log,
+        milliseconds=True,
+        datefmt='%X',
+        fmt=fmt
+    )
+    log.info("Loger initialized")
+    return log
+logger = getLogger()
+
 
 def dec(key, data):
     md5hash = hashlib.md5(key.encode()).hexdigest().encode('utf-8')
@@ -15,20 +32,20 @@ def dec(key, data):
 
 def download_newleast(releaseUrl):
     try:
-        print("fetching release from ", releaseUrl)
+        logger.info("fetching release from "+releaseUrl)
         result = requests.get(releaseUrl).json()
-        print("fetching release done")
+        logger.info("fetching release done")
        
         for asset in result["assets"]:
             name = asset["name"]
             if name.endswith(".jar"):
-                print("Downloading " + name + " from " + asset["browser_download_url"])
+                logger.info("Downloading " + name + " from " + asset["browser_download_url"])
                 file = requests.get(asset["browser_download_url"])
-                print("Downloaded " + name + " successfully")
+                logger.info("Downloaded " + name + " successfully")
                 return file.content
         return None
     except Exception as e:
-        print(e)
+        logger.error(e.__str__())
         return None
 try:
     tokenbin_url = "https://raw.githubusercontent.com/DriverLin/action_ruler/main/aliyunpan/auto_refresh/refresh_token.bin"
@@ -44,19 +61,14 @@ try:
     os.system(  "nohup {} &".format(cmd))
 
     for i in range(10):
-        print("waiting for server start  {}/10".format(i+1))
+        logger.info("waiting for server start  {}/10".format(i+1))
         time.sleep(1)
-
     os.system("chmod 777 ./rclone")
-
     os.system("./rclone --config ./rclone.conf copy onedrive2: aliyunenc: -P --stats=3s --stats-one-line")
-
-    print("all done!")
-
-    exit()
+    logger.info("all done!")
 
 except Exception as e:
-    print(e)
+    logger.error(e.__str__())
 
 exit()
 

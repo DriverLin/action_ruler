@@ -4,26 +4,41 @@ import urllib.parse
 import string
 import os
 import ssl
-
+import coloredlogs
+import logging
 ssl._create_default_https_context = ssl._create_unverified_context
+
+def getLogger():
+    log = logging.getLogger(f'{"main"}:{"loger"}')
+    fmt = f'%(asctime)s.%(msecs)03d .%(levelname)s \t%(message)s'
+    coloredlogs.install(
+        level=logging.DEBUG,
+        logger=log,
+        milliseconds=True,
+        datefmt='%X',
+        fmt=fmt
+    )
+    log.info("Loger initialized")
+    return log
 
 if __name__ == "__main__":
     try:
+        logger =  getLogger()
         token = os.environ.get("TOKEN")
         tag=os.environ.get("TAG")
         title=os.environ.get("TITLE")
         text = os.environ.get("TEXT")
-        print("tag: " + tag)
-        print("title: " + title)
-        print("text: " + text)
+        logger.info("tag: " + tag)
+        logger.info("title: " + title)
+        logger.info("text: " + text)
         param = urllib.parse.urlencode(
             {"tag": tag, "title": title, "text": text}, quote_via=urllib.parse.quote
         )
         apiUrl = "https://trigger.macrodroid.com/{}?{}".format(token, param)
-        print(param)
+        logger.info(param)
         req = urllib.request.Request(apiUrl)
         url_open = urllib.request.urlopen(req)
         data = url_open.read()
-        print(data)
+        logger.info(data)
     except Exception as e:
-        print("Error: ", e)
+        logger.error(e.__str__())
