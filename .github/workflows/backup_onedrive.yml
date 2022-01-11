@@ -5,8 +5,13 @@ on:
   # watch:
   #   types: started
   workflow_dispatch:
-  # schedule:
-  #     - cron: '*/60  * * * *'
+  repository_dispatch:
+    types:
+      - backuponedrive2toaliyunenc
+      #远程触发backupnow
+  schedule:
+      - cron: '00 06 * * *'
+      #每天6点一次
   # Triggers the workflow on push or pull request events but only for the main branch
   # push:
   #   branches: [ main ]
