@@ -1,4 +1,5 @@
 #!/usr/bin/python -u
+import subprocess
 import requests
 import json
 from cryptography.fernet import Fernet 
@@ -47,6 +48,30 @@ def download_newleast(releaseUrl):
     except Exception as e:
         logger.error(e.__str__())
         return None
+
+def executor(cmd,logger,lineSplitSymbol=b'\r\n'):
+    logger.warning("running\t["+cmd+"]")
+    try:
+        result = subprocess.Popen(cmd, stdout=subprocess.PIPE,shell=True)
+        count = 0
+        buffer = b''
+        while count<128:
+            line = result.stdout.read(1)
+            buffer += line
+            if  lineSplitSymbol in buffer:
+                buffer = buffer.split(lineSplitSymbol)[0]
+                try:
+                    logger.info(buffer.decode("UTF-8"))
+                except:
+                    logger.info(buffer.decode("GBK"))
+                buffer = b''
+            if line == b'':
+                count += 1  
+    except Exception as e:
+        logger.info(e.__str__())
+
+    logger.warning("over\t["+cmd+"]")
+    
 try:
     tokenbin_url = "https://raw.githubusercontent.com/DriverLin/action_ruler/main/aliyunpan/auto_refresh/refresh_token.bin"
     response = requests.get(tokenbin_url)
@@ -64,7 +89,7 @@ try:
         logger.info("waiting for server start  {}/10".format(i+1))
         time.sleep(1)
     os.system("chmod 777 ./rclone")
-    os.system("./rclone --config ./rclone.conf copy onedrive2: aliyunenc: -P --stats=3s --stats-one-line")
+    executor("./rclone --config ./rclone.conf copy onedrive2: aliyunenc: -P --stats=3s --stats-one-line",logger,b'(xfr#0/468)')
     logger.info("all done!")
 
 except Exception as e:
