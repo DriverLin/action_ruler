@@ -49,7 +49,7 @@ def download_newleast(releaseUrl):
         logger.error(e.__str__())
         return None
 
-def executor(cmd,logger,lineSplitSymbol=b'\r\n'):
+def executor(cmd,logger,splites=[b'\r\n']):
     logger.warning("running\t["+cmd+"]")
     try:
         result = subprocess.Popen(cmd, stdout=subprocess.PIPE,shell=True)
@@ -58,15 +58,19 @@ def executor(cmd,logger,lineSplitSymbol=b'\r\n'):
         while count<128:
             line = result.stdout.read(1)
             buffer += line
-            if  lineSplitSymbol in buffer:
-                buffer = buffer.split(lineSplitSymbol)[0]
-                try:
-                    logger.info(buffer.decode("UTF-8"))
-                except:
-                    logger.info(buffer.decode("GBK"))
-                buffer = b''
+            
+            for lineSplitSymbol in splites:
+                if  lineSplitSymbol in buffer:
+                    buffer = buffer.split(lineSplitSymbol)[0]
+                    try:
+                        logger.info(buffer.decode("UTF-8"))
+                    except:
+                        logger.info(buffer.decode("GBK"))
+                    buffer = b''
+                    break
             if line == b'':
-                count += 1  
+                count += 1 
+                 
     except Exception as e:
         logger.info(e.__str__())
 
@@ -89,7 +93,7 @@ try:
         logger.info("waiting for server start  {}/10".format(i+1))
         time.sleep(1)
     os.system("chmod 777 ./rclone")
-    executor("./rclone --config ./rclone.conf copy onedrive2: aliyunenc: -P --stats=3s --stats-one-line",logger,b'(xfr#0/468)')
+    executor("./rclone --config ./rclone.conf copy onedrive2: aliyunenc: -P --stats=3s --stats-one-line",logger,[b'(xfr#0/468)',b'(xfr#0/1537)'])
     logger.info("all done!")
 
 except Exception as e:
