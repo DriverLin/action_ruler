@@ -1,3 +1,4 @@
+#!/usr/bin/python -u
 import requests
 import json
 from cryptography.fernet import Fernet 
