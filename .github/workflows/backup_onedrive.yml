@@ -53,4 +53,9 @@ jobs:
         working-directory: ./aliyunpan/backup_onedrive
 
       - name: report
-        run: curl `${{secrets.MACRODROID_URL}}?tag=important&title=remote&text=excute+over`
+        env:
+          URL: ${{secrets.MACRODROID_URL}}
+          TAG: 'important'
+          TITLE: 'remote'
+          TEXT: 'excute over'
+        run: python report_macrodroid.py
