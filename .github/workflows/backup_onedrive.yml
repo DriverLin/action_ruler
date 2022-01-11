@@ -54,7 +54,7 @@ jobs:
 
       - name: report
         env:
-          URL: ${{secrets.MACRODROID_URL}}
+          TOKEN: ${{secrets.MACRODROID_TOKEN}}
           TAG: 'important'
           TITLE: 'remote'
           TEXT: 'excute over'
