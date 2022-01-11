@@ -51,31 +51,6 @@ def download_newleast(releaseUrl):
         logger.error(e.__str__())
         return None
 
-
-# "bytes": 195692061,
-#         "checks": 71,
-#         "deletes": 0,
-#         "elapsedTime": 139.6542406,
-#         "errors": 0,
-#         "fatalError": false,
-#         "renames": 0,
-#         "retryError": false,
-#         "speed": 1466039.7008284763,
-#         "transferTime": 133.4834663,
-{
-    "bytes": 195692061,
-    "checks": 71,
-    "deletes": 0,
-    "elapsedTime": 139.6542406,
-    "errors": 0,
-    "fatalError": False,
-    "renames": 0,
-    "retryError": False,
-    "speed": 1466039.7008284763,
-    "transferTime": 133.4834663,
-}
-
-
 def rcloneExecutor(cmd, logger):
     if "-P" in cmd:
         cmd = cmd.replace("-P", "")
@@ -86,6 +61,7 @@ def rcloneExecutor(cmd, logger):
     processThread = threading.Thread(target=os.system, args=(cmd,))
     processThread.start()
     time.sleep(3)
+    msg = ''
     while processThread.is_alive():
         res = os.popen("./rclone rc core/stats").read()
         try:
@@ -94,12 +70,13 @@ def rcloneExecutor(cmd, logger):
             transfered = int(state["bytes"] / 1048576 * 100) / 100#MB
             usedTime = str(int(state["transferTime"]/60)) +"min "+ str(int(state["transferTime"])%60) +"s"    #min
             formatedOutput = "trasnfed {}mb  \t{}  \t{}mb/s".format(transfered, usedTime, speed)
+            msg = formatedOutput
             logger.info(formatedOutput)
         except Exception as e:
             logger.error(e)
         time.sleep(1)
     logger.warning("over\t[" + cmd + "]")
-
+    return msg
 
 
 try:
@@ -123,10 +100,14 @@ try:
         logger.info("waiting for server start  {}/10".format(i + 1))
         time.sleep(1)
     os.system("chmod 777 ./rclone")
-    rcloneExecutor(
+    msg = rcloneExecutor(
         "./rclone --config ./rclone.conf copy onedrive2: aliyunenc: --rc", logger
     )
     logger.info("all done!")
+
+    with open("/tmp/msg", "w",encoding="UTF-8") as f:
+        f.write(msg)
+
 
 except Exception as e:
     logger.error(e.__str__())

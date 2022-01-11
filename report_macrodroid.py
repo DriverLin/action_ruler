@@ -21,13 +21,21 @@ def getLogger():
     log.info("Loger initialized")
     return log
 
+
+
+
 if __name__ == "__main__":
     try:
         logger =  getLogger()
-        token = os.environ.get("TOKEN")
-        tag=os.environ.get("TAG")
-        title=os.environ.get("TITLE")
-        text = os.environ.get("TEXT")
+        token = os.environ.get("TOKEN") | "none/none"
+        tag=os.environ.get("TAG") | "info"
+        title=os.environ.get("TITLE") | "No title"
+
+        text = os.environ.get("TEXT") | "No text"
+        if os.path.exists("/tmp/msg"):
+            text = open("/tmp/msg", "r",encoding="UTF-8").read()
+            os.remove("/tmp/msg")
+
         logger.info("tag: " + tag)
         logger.info("title: " + title)
         logger.info("text: " + text)

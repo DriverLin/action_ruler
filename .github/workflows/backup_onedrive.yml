@@ -57,5 +57,5 @@ jobs:
           TOKEN: ${{secrets.MACRODROID_TOKEN}}
           TAG: 'important'
           TITLE: 'remote'
-          TEXT: 'excute over'
+          # TEXT: 'excute over'
         run: python report_macrodroid.py
