@@ -31,7 +31,7 @@ jobs:
           architecture: 'x64'
 
       - name: install package
-        run: pip install requests cryptography 
+        run: pip install requests cryptography coloredlogs
 
       - name: run main
         env:
