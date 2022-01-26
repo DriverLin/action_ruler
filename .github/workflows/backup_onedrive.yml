@@ -41,6 +41,9 @@ jobs:
         with:
           python-version: '3.8'
           architecture: 'x64'
+      
+      - name: install rclone
+        run: sudo apt-get install -y rclone
 
       - name: install package
         run: pip install requests cryptography coloredlogs

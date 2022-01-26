@@ -99,9 +99,9 @@ try:
     for i in range(10):
         logger.info("waiting for server start  {}/10".format(i + 1))
         time.sleep(1)
-    os.system("chmod 777 ./rclone")
+    # os.system("chmod 777 ./rclone")
     msg = rcloneExecutor(
-        "./rclone --config ./rclone.conf copy onedrive2: aliyunenc: --rc", logger
+        "rclone --config ./rclone.conf copy onedrive2: aliyunenc: --rc", logger
     )
     logger.info("all done!")
 
