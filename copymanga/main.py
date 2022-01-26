@@ -190,7 +190,6 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
     logger.info("closed" + str(time() - closeStart))    
     logger.info(manga_id + "All over!")
 
-
 #=======================================================================================================================
 cache = json.load(open(r"cache.json", "r", encoding="utf-8"))
 watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
