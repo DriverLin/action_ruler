@@ -181,7 +181,7 @@ watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
 print(os.environ)
 
 
-os.system("nohup sudo rclone --config ./rclone.conf mount onedrive:Manga  /mnt/managaMountPoint --vfs-cache-mode full &")
+os.system("nohup rclone --config ./rclone.conf mount onedrive:Manga  /mnt/managaMountPoint --vfs-cache-mode full &")
 sleep(5)
 for (mid,mname) in watchList:
     copymanga_download(mid, mname, "/mnt/managaMountPoint")
