@@ -177,10 +177,6 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
 #=======================================================================================================================
 cache = json.load(open(r"cache.json", "r", encoding="utf-8"))
 watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
-
-print(os.environ)
-
-
 os.system("nohup rclone --config ./rclone.conf mount onedrive:Manga  /mnt/managaMountPoint --vfs-cache-mode full &")
 sleep(5)
 for (mid,mname) in watchList:
