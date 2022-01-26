@@ -5,10 +5,10 @@ on:
   # watch:
   #   types: started
   workflow_dispatch:
-  repository_dispatch:
-    types:
-      - updateManga
-      #远程触发backupnow
+  # repository_dispatch:
+  #   types:
+  #     - updateManga
+  #     #远程触发backupnow
   schedule:
       - cron: '00 22 * * *'
       - cron: '00 3 * * *'
