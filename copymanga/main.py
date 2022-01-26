@@ -173,7 +173,7 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
 
     for i in range(10):
         logger.info("caching ...  " + str(i) )
-        time.sleep(1)
+        sleep(1)
 
     logger.info(zfp.namelist())
 
