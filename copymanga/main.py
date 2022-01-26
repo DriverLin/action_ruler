@@ -1,3 +1,4 @@
+import datetime
 import threading
 from time import sleep, time
 import json
@@ -20,7 +21,7 @@ def getLogger():
     log.info("Loger initialized")
     return log
 
-
+updateCount = 0
 logger = getLogger()
 
 
@@ -49,6 +50,7 @@ def download_img(url, path):
 
 @vthread.pool(16)
 def download_img_tozip(url, name, zfp, write_lock):
+    global updateCount
     if name in zfp.namelist():
         # logger.info("pass"+name)
         pass
@@ -59,6 +61,7 @@ def download_img_tozip(url, name, zfp, write_lock):
                 bytes = requests.get(url, stream=True).content
                 write_lock.acquire()
                 zfp.writestr(name, bytes)
+                updateCount += 1
                 write_lock.release()
                 logger.info(">" * retry + "success : "+ name)
                 break
@@ -166,6 +169,7 @@ def modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock):
 
 
 def copymanga_download(manga_id, save_name=None, save_path=r"./"):
+    global updateCount
     save_name = manga_id if save_name == None else save_name
     packPath = os.path.join(save_path, "{}.zip".format(save_name))
 
@@ -181,14 +185,21 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
     logger.info(zfp.namelist())
 
     lock = threading.Lock()
+    
+    updateCount = 0
+    
     for ch in get_chapters(manga_id):
         modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock)
+    
     vthread.vthread.pool.waitall()
     logger.info("closing...")
     closeStart = time()
     zfp.close()
-    logger.info("closed" + str(time() - closeStart))    
-    logger.info(manga_id + "All over!")
+    logger.info("use {:.2f}s to close".format(time() - closeStart))    
+
+    return updateCount
+
+
 
 #=======================================================================================================================
 cache = json.load(open(r"cache.json", "r", encoding="utf-8"))
@@ -200,8 +211,18 @@ for i in range(10):
     logger.info("Waiting for mount onedrive "+str(i))
     sleep(1)
 
+
+def notify_update(mid,mname,updates):
+    pass
+
+updateLog = "start time: " + str(datetime.datetime.now()) + "\n"
 for (mid,mname) in watchList:
     logger.info("Start download "+mid+" "+mname)
-    copymanga_download(mid, mname, "/tmp/manga")
+    updates = copymanga_download(mid, mname, "/tmp/manga")
+    logger.info("{} Update {} pages".format(mname,updates))
+    updateLog.join("{} Update {} pages\n".format(mname,updates))
+    if updates > 0:
+        notify_update(mid,mname,updates)
 
+updateLog.join("end time: " + str(datetime.datetime.now()) + "\n")
 json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
