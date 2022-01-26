@@ -27,6 +27,17 @@ def getLogger():
 if __name__ == "__main__":
     try:
         logger =  getLogger()
+
+        msgcheck = os.environ.get("MSGCHECK") or False
+        
+        if msgcheck:
+            if os.path.exists("/tmp/msg"):
+               pass
+            else:
+                logger.info("MSGCHECK is set, but no msg file found")
+                exit(0)
+
+
         token = os.environ.get("TOKEN") or "none/none"
         tag=os.environ.get("TAG") or "info"
         title=os.environ.get("TITLE") or "No title"

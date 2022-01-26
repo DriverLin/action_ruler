@@ -52,6 +52,15 @@ jobs:
         run: python main.py
         working-directory: ./copymanga
 
+      - name: report
+        env:
+          TOKEN: ${{secrets.MACRODROID_TOKEN}}
+          TAG: 'important'
+          TITLE: 'remote'
+          MSGCHECK: "TRUE"
+          # TEXT: 'excute over'
+        run: python report_macrodroid.py
+      
       - name: commit
         run: |
           git config --global user.email lty6531600@outlook.com

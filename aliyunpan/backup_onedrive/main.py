@@ -105,6 +105,7 @@ try:
     )
     logger.info("all done!")
 
+
     with open("/tmp/msg", "w",encoding="UTF-8") as f:
         f.write(msg)
 

@@ -201,9 +201,10 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
 
 
 
-
+msg = ""
 def notify_update(mid,mname,updates):
-    pass
+    global msg
+    msg += "{} 更新了 {} 页\n".format(mname,updates)
 
 #=======================================================================================================================
 cache = json.load(open(r"cache.json", "r", encoding="utf-8"))
@@ -232,3 +233,9 @@ json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
 
 with open("./log.log" , 'w' , encoding="utf-8") as f:
     f.write(updateLog)
+
+if msg == "":
+    pass
+else:
+    with open("/tmp/msg", "w",encoding="UTF-8") as f:
+        f.write(msg)
