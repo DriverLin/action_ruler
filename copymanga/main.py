@@ -49,7 +49,7 @@ def download_img(url, path):
 
 @vthread.pool(16)
 def download_img_tozip(url, name, zfp, write_lock):
-    if name in zfp.namelist():
+    if name in [x.replace("\\","/") for x in zfp.namelist()]:
         logger.info("pass"+name)
     else:
         retry = 0
@@ -98,6 +98,7 @@ def get_pages(comic_id, chapter_uid, retry=0):
     global cache
     key = "{}_{}".format(comic_id, chapter_uid)
     if key in cache:
+        logger.info("get_pages from cache" + comic_id + chapter_uid)
         return cache[key]
 
     imgs = []
@@ -180,7 +181,12 @@ cache = json.load(open(r"cache.json", "r", encoding="utf-8"))
 watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
 os.system("mkdir /tmp/manga")
 os.system("nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &")
-sleep(5)
+
+for i in range(10):
+    logger.info("Waiting for mount onedrive"+str(i))
+    sleep(1)
+
 for (mid,mname) in watchList:
+    logger.info("Start download "+mid+" "+mname)
     copymanga_download(mid, mname, "/tmp/manga")
 json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
