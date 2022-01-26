@@ -175,16 +175,11 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
         with open(packPath,'rb') as fp:
             bytes = fp.read(test)
             logger.info("{} test read {} bytes success".format(packPath,len(bytes)))
+
     zfp = zipfile.ZipFile(packPath, "a", zipfile.ZIP_DEFLATED)
-
-    for i in range(10):
-        logger.info("caching ...  " + str(i) )
-        sleep(1)
-
+    
     logger.info(zfp.namelist())
 
-    return
-    
     lock = threading.Lock()
     for ch in get_chapters(manga_id):
         modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock)
