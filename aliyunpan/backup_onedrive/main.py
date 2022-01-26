@@ -63,7 +63,7 @@ def rcloneExecutor(cmd, logger):
     time.sleep(3)
     msg = ''
     while processThread.is_alive():
-        res = os.popen("./rclone rc core/stats").read()
+        res = os.popen("rclone rc core/stats").read()
         try:
             state = json.loads(res)
             speed = int(state["speed"] / 1048576 * 100) / 100#MB/S
