@@ -46,7 +46,7 @@ jobs:
         env:
           KEY: ${{secrets.KEY}}
           RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
-        run: python main.py
+        run: sudo -E python main.py
         working-directory: ./copymanga
 
       - name: commit
