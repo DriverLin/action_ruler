@@ -169,6 +169,12 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
     save_name = manga_id if save_name == None else save_name
     packPath = os.path.join(save_path, "{}.zip".format(save_name))
 
+    if os.path.exists(packPath):
+        total = os.stat(packPath).st_size
+        test = total if total < 1024*1024*16 else 1024*1024*16
+        with open(packPath,'rb') as fp:
+            bytes = fp.read(test)
+            logger.info("{} test read {} bytes success".format(packPath,len(bytes)))
     zfp = zipfile.ZipFile(packPath, "a", zipfile.ZIP_DEFLATED)
 
     for i in range(10):
@@ -200,4 +206,5 @@ for i in range(10):
 for (mid,mname) in watchList:
     logger.info("Start download "+mid+" "+mname)
     copymanga_download(mid, mname, "/tmp/manga")
+
 json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
