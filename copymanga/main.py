@@ -225,4 +225,7 @@ for (mid,mname) in watchList:
         notify_update(mid,mname,updates)
 
 updateLog.join("end time: " + str(datetime.datetime.now()) + "\n")
+
 json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
+with open("./log.log" , 'w' , encoding="utf-8") as f:
+    f.write(updateLog)
