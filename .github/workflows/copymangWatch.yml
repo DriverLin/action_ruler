@@ -44,6 +44,7 @@ jobs:
 
       - name: run main
         env:
+          KEY: ${{secrets.KEY}}
           RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
         run: python main.py
         working-directory: ./copymanga
