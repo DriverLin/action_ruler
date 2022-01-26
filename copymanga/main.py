@@ -49,8 +49,8 @@ def download_img(url, path):
 
 @vthread.pool(16)
 def download_img_tozip(url, name, zfp, write_lock):
-    if name in [x.replace("\\","/") for x in zfp.namelist()]:
-        logger.info("pass"+name)
+    if name in zfp.namelist():
+        # logger.info("pass"+name)
         pass
     else:
         retry = 0
@@ -177,14 +177,17 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
             logger.info("{} test read {} bytes success".format(packPath,len(bytes)))
 
     zfp = zipfile.ZipFile(packPath, "a", zipfile.ZIP_DEFLATED)
-    
+
     logger.info(zfp.namelist())
 
     lock = threading.Lock()
     for ch in get_chapters(manga_id):
         modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock)
     vthread.vthread.pool.waitall()
+    logger.info("closing...")
+    closeStart = time()
     zfp.close()
+    logger.info("closed" + str(time() - closeStart))    
     logger.info(manga_id + "All over!")
 
 
