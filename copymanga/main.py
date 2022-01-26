@@ -27,7 +27,8 @@ logger = getLogger()
 @vthread.pool(16)
 def download_img(url, path):
     if os.path.exists(path):
-        logger.info("pass"+path)
+        # logger.info("pass"+path)
+        pass
     else:
         retry = 0
         while True:
