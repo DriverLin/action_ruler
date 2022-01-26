@@ -51,6 +51,7 @@ def download_img(url, path):
 def download_img_tozip(url, name, zfp, write_lock):
     if name in [x.replace("\\","/") for x in zfp.namelist()]:
         logger.info("pass"+name)
+        pass
     else:
         retry = 0
         while True:
@@ -168,6 +169,7 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
     save_name = manga_id if save_name == None else save_name
     packPath = os.path.join(save_path, "{}.zip".format(save_name))
     zfp = zipfile.ZipFile(packPath, "a", zipfile.ZIP_DEFLATED)
+    logger.info(zfp.namelist())
     lock = threading.Lock()
     for ch in get_chapters(manga_id):
         modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock)
