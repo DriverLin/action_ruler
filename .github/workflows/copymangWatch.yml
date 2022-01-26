@@ -56,7 +56,7 @@ jobs:
         env:
           TOKEN: ${{secrets.MACRODROID_TOKEN}}
           TAG: 'important'
-          TITLE: 'remote'
+          TITLE: '漫画更新了'
           MSGCHECK: "TRUE"
           # TEXT: 'excute over'
         run: python report_macrodroid.py
