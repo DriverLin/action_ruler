@@ -102,7 +102,7 @@ def get_pages(comic_id, chapter_uid, retry=0):
     global cache
     key = "{}_{}".format(comic_id, chapter_uid)
     if key in cache:
-        logger.info("get_pages from cache" + comic_id + chapter_uid)
+        logger.info("get_pages from cache " + comic_id + chapter_uid)
         return cache[key]
 
     imgs = []
