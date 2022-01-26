@@ -201,6 +201,10 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
 
 
 
+
+def notify_update(mid,mname,updates):
+    pass
+
 #=======================================================================================================================
 cache = json.load(open(r"cache.json", "r", encoding="utf-8"))
 watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
@@ -212,10 +216,8 @@ for i in range(10):
     sleep(1)
 
 
-def notify_update(mid,mname,updates):
-    pass
-
 updateLog = "start time: " + str(datetime.datetime.now()) + "\n"
+
 for (mid,mname) in watchList:
     logger.info("Start download "+mid+" "+mname)
     updates = copymanga_download(mid, mname, "/tmp/manga")
@@ -227,5 +229,6 @@ for (mid,mname) in watchList:
 updateLog.join("end time: " + str(datetime.datetime.now()) + "\n")
 
 json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
+
 with open("./log.log" , 'w' , encoding="utf-8") as f:
     f.write(updateLog)
