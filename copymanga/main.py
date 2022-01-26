@@ -43,7 +43,7 @@ def download_img(url, path):
                 logger.info(">" * retry + "success : " + path)
                 break
             except Exception as e:
-                logger.warning(">" * retry + url+ path+ e)
+                logger.warning(">" * retry + url+ path+ e.__str__())
                 retry += 1
                 sleep(1)
 
@@ -66,7 +66,7 @@ def download_img_tozip(url, name, zfp, write_lock):
                 logger.info(">" * retry + "success : "+ name)
                 break
             except Exception as e:
-                logger.warning(">" * retry + "error! : " + name+ "\t"+ e)
+                logger.warning(">" * retry + "error! : " + name+ "\t"+ e.__str__())
                 retry += 1
                 sleep(1)
 
@@ -92,7 +92,7 @@ def get_chapters(comic_id, retry=0):
         logger.info(">" * retry + "get_chapters" + comic_id)
         return chapters
     except Exception as e:
-        logger.warning(">" * retry + e)
+        logger.warning(">" * retry + e.__str__())
         sleep(1)
         return get_chapters(comic_id, retry + 1)
 
@@ -123,7 +123,7 @@ def get_pages(comic_id, chapter_uid, retry=0):
         cache[key] = imgs
         return imgs
     except Exception as e:
-        logger.warning(">" * retry + e)
+        logger.warning(">" * retry + e.__str__())
         sleep(1)
         return get_pages(comic_id, chapter_uid, retry + 1)
 
