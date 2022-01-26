@@ -172,7 +172,7 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
     zfp = zipfile.ZipFile(packPath, "a", zipfile.ZIP_DEFLATED)
 
     for i in range(10):
-        logger.info("caching ...  " + i )
+        logger.info("caching ...  " + str(i) )
         time.sleep(1)
 
     logger.info(zfp.namelist())
