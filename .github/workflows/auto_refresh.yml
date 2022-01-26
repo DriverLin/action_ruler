@@ -43,6 +43,7 @@ jobs:
         run: |
           git config --global user.email lty6531600@outlook.com
           git config --global user.name DriverLin
+          git pull
           git add .
           git commit -m "update" -a
 
