@@ -222,11 +222,11 @@ for (mid,mname) in watchList:
     logger.info("Start download "+mid+" "+mname)
     updates = copymanga_download(mid, mname, "/tmp/manga")
     logger.info("{} Update {} pages".format(mname,updates))
-    updateLog.join("{} Update {} pages\n".format(mname,updates))
+    updateLog += "{} Update {} pages\n".format(mname,updates)
     if updates > 0:
         notify_update(mid,mname,updates)
 
-updateLog.join("end time: " + str(datetime.datetime.now()) + "\n")
+updateLog += "end time: " + str(datetime.datetime.now()) + "\n"
 
 json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
 
