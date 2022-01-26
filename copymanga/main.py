@@ -168,8 +168,17 @@ def modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock):
 def copymanga_download(manga_id, save_name=None, save_path=r"./"):
     save_name = manga_id if save_name == None else save_name
     packPath = os.path.join(save_path, "{}.zip".format(save_name))
+
     zfp = zipfile.ZipFile(packPath, "a", zipfile.ZIP_DEFLATED)
+
+    for i in range(10):
+        logger.info("caching ...  " + i )
+        time.sleep(1)
+
     logger.info(zfp.namelist())
+
+    return
+    
     lock = threading.Lock()
     for ch in get_chapters(manga_id):
         modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock)
@@ -185,7 +194,7 @@ os.system("mkdir /tmp/manga")
 os.system("nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &")
 
 for i in range(10):
-    logger.info("Waiting for mount onedrive"+str(i))
+    logger.info("Waiting for mount onedrive "+str(i))
     sleep(1)
 
 for (mid,mname) in watchList:
