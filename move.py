@@ -64,7 +64,7 @@ def singleRepackProcess(instance,workdir):
 
 
     start = time()
-    uploadCmd = "rclone --config ./rclone.conf  copy /tmp/manga/{} 'onedrive:tmp/{}' ".format(instance["Name"][:-4],instance["Name"][:-4])
+    uploadCmd = "rclone --config ./rclone.conf  copy '/tmp/manga/{}' 'onedrive:tmp/{}' ".format(instance["Name"][:-4],instance["Name"][:-4])
     os.system(uploadCmd)
 
 
