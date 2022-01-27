@@ -49,7 +49,7 @@ jobs:
         run: sudo apt-get install -y rclone
 
       - name: install python package
-        run: pip install requests vthread coloredlogs bottle
+        run: pip install requests vthread coloredlogs bottle cryptography
 
       - name: start api server
         run: nohup python api_server.py &
