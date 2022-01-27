@@ -34,6 +34,12 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Setup Java JDK
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '17'
+          
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
@@ -42,34 +48,53 @@ jobs:
       - name: install rclone
         run: sudo apt-get install -y rclone
 
-      - name: install package
-        run: pip install requests vthread coloredlogs
+      - name: install python package
+        run: pip install requests vthread coloredlogs bottle
 
-      - name: run main
+      - name: start api server
+        run: nohup python api_server.py &
+
+      - name: deploy aliyun
         env:
           KEY: ${{secrets.KEY}}
-          RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
-        run: python main.py
-        working-directory: ./copymanga
-
-      - name: report
-        env:
-          TOKEN: ${{secrets.MACRODROID_TOKEN}}
-          TAG: 'important'
-          TITLE: '漫画更新了'
-          MSGCHECK: "TRUE"
-          # TEXT: 'excute over'
-        run: python report_macrodroid.py
-      
-      - name: commit
         run: |
-          git config --global user.email lty6531600@outlook.com
-          git config --global user.name DriverLin
-          git pull
-          git add .
-          git commit -m "update" -a
+          wget --post-data '{"key": "'$KEY'"}' http://127.0.0.1/api/getRefreshToken -O /tmp/refreshtoken.bin
+          wget  http://127.0.0.1/api/api/aliyunwebdav/latest/url -O /tmp/aliyundavURL
+          wget `cat /tmp/aliyundavURL` -O /tmp/aliyunwebdav.jar
+          nohup java -jar /tmp/aliyunwebdav.jar --aliyundrive.refresh-token=`cat /tmp/refreshtoken.bin` --server.port=8900 --aliyundrive.auth.enable=false > /dev/null &
 
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: rclone test
+        env: 
+          RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
+        run: 
+          rclone --config ./rclone.conf ls 'aliyun:'
+
+
+      # - name: run main
+      #   env:
+      #     KEY: ${{secrets.KEY}}
+      #     RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
+      #   run: python main.py
+      #   working-directory: ./copymanga
+
+      # - name: report
+      #   env:
+      #     TOKEN: ${{secrets.MACRODROID_TOKEN}}
+      #     TAG: 'important'
+      #     TITLE: '漫画更新了'
+      #     MSGCHECK: "TRUE"
+      #     # TEXT: 'excute over'
+      #   run: python report_macrodroid.py
+      
+      # - name: commit
+      #   run: |
+      #     git config --global user.email lty6531600@outlook.com
+      #     git config --global user.name DriverLin
+      #     git pull
+      #     git add .
+      #     git commit -m "update" -a
+
+      # - name: Push changes
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -46,7 +46,7 @@ jobs:
         run: sudo apt-get install -y rclone
 
       - name: install package
-        run: pip install requests cryptography coloredlogs
+        run: pip install requests cryptography coloredlogs bottle
 
       - name: run main
         env:
