@@ -51,35 +51,43 @@ jobs:
       - name: 安装python包
         run: pip install requests vthread coloredlogs bottle cryptography
 
-      - name: 启动api服务器
-        run: nohup python api_server.py &
+      # - name: 启动api服务器
+      #   run: nohup python api_server.py &
 
-      - name: 启动aliyunwebdav
-        env:
-          KEY: ${{secrets.KEY}}
-        run: |
-          wget --post-data '{"key": "'$KEY'"}' http://127.0.0.1:8088/api/getRefreshToken -O /tmp/refreshtoken.bin
-          wget  http://127.0.0.1:8088/api/aliyunwebdav/latest/url -O /tmp/aliyundavURL
-          wget `cat /tmp/aliyundavURL` -O /tmp/aliyunwebdav.jar
-          nohup java -jar /tmp/aliyunwebdav.jar --aliyundrive.refresh-token=`cat /tmp/refreshtoken.bin` --server.port=8900 --aliyundrive.auth.enable=false > /dev/null &
-          sleep 10
+      # - name: 启动aliyunwebdav
+      #   env:
+      #     KEY: ${{secrets.KEY}}
+      #   run: |
+      #     wget --post-data '{"key": "'$KEY'"}' http://127.0.0.1:8088/api/getRefreshToken -O /tmp/refreshtoken.bin
+      #     wget  http://127.0.0.1:8088/api/aliyunwebdav/latest/url -O /tmp/aliyundavURL
+      #     wget `cat /tmp/aliyundavURL` -O /tmp/aliyunwebdav.jar
+      #     nohup java -jar /tmp/aliyunwebdav.jar --aliyundrive.refresh-token=`cat /tmp/refreshtoken.bin` --server.port=8900 --aliyundrive.auth.enable=false > /dev/null &
+      #     sleep 10
 
-      - name: 挂载网盘到/mnt/Manga
+      # - name: 挂载aliyunpan到/mnt/Manga
+      #   env: 
+      #     RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
+      #   run: |
+      #     mkdir /tmp/manga 
+      #     nohup rclone --config ./rclone.conf mount aliyun:Manga  /tmp/manga --vfs-cache-mode full &
+      #     sleep 5
+
+      - name: 挂载onedrive到/mnt/Manga
         env: 
           RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
         run: |
           mkdir /tmp/manga 
-          nohup rclone --config ./rclone.conf mount aliyun:Manga  /tmp/manga --vfs-cache-mode full &
+          nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &
           sleep 5
 
-      - name: 主过程
+      - name: main
         env:
           KEY: ${{secrets.KEY}}
           RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
         run: python main.py
         working-directory: ./copymanga
 
-      - name: 上报
+      - name: report
         env:
           TOKEN: ${{secrets.MACRODROID_TOKEN}}
           TAG: 'important'
