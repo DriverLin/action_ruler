@@ -169,9 +169,16 @@ def modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock):
 
 
 def copymanga_download(manga_id, save_name=None, save_path=r"./"):
-    global updateCount
+    global updateCount,cache
     save_name = manga_id if save_name == None else save_name
     packPath = os.path.join(save_path, "{}.zip".format(save_name))
+
+    chapters = get_chapters(manga_id)
+    
+    key = "last_len_of_{}".format(manga_id)
+    if key in cache and cache[key] == len(chapters):
+        logger.warning("{} is already up to date".format(manga_id))
+        return 0#如果章节数不变 则认为没有更新 跳过
 
     if os.path.exists(packPath):
         total = os.stat(packPath).st_size
@@ -188,15 +195,17 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
     
     updateCount = 0
     
-    for ch in get_chapters(manga_id):
+    for ch in chapters:
         modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock)
     
     vthread.vthread.pool.waitall()
+
     logger.info("closing...")
     closeStart = time()
     zfp.close()
     logger.info("use {:.2f}s to close".format(time() - closeStart))    
-
+    cache[key] == len(chapters)#只有在全部完成一次后才会更新章节数记录
+    json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
     return updateCount
 
 
