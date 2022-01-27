@@ -37,7 +37,7 @@ def download_img(url, path):
                 tmp_path = path + ".tmp"
 
                 with open(tmp_path, "wb") as f:
-                    f.write(requests.get(url, stream=True).content)
+                    f.write(requests.get(url, stream=True,timeout=5).content)
 
                 shutil.move(tmp_path, path)
                 logger.info(">" * retry + "success : " + path)
@@ -58,7 +58,7 @@ def download_img_tozip(url, name, zfp, write_lock):
         retry = 0
         while True:
             try:
-                bytes = requests.get(url, stream=True).content
+                bytes = requests.get(url, stream=True,timeout=5).content
                 write_lock.acquire()
                 zfp.writestr(name, bytes)
                 updateCount += 1
@@ -76,7 +76,8 @@ def get_chapters(comic_id, retry=0):
         first = requests.get(
             "https://api.copymanga.com/api/v3/comic/{}/group/default/chapters?limit=100&offset=0&platform=3".format(
                 comic_id
-            )
+            ),
+            timeout=10,
         ).json()
         chapters = [x for x in first["results"]["list"]]
         total = first["results"]["total"]
@@ -89,7 +90,7 @@ def get_chapters(comic_id, retry=0):
             ).json()
             for ch in tmp["results"]["list"]:
                 chapters.append(ch)
-        logger.info(">" * retry + "get_chapters" + comic_id)
+        logger.info(">" * retry + "get_chapters " + comic_id)
         return chapters
     except Exception as e:
         logger.warning(">" * retry + e.__str__())
@@ -110,7 +111,8 @@ def get_pages(comic_id, chapter_uid, retry=0):
         result = requests.get(
             "https://api.copymanga.com/api/v3/comic/{}/chapter2/{}?platform=3".format(
                 comic_id, chapter_uid
-            )
+            ),
+            timeout=10,
         ).json()
         assert len(result["results"]["chapter"]["contents"]) == len(
             result["results"]["chapter"]["words"]
@@ -182,10 +184,11 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
 
     if os.path.exists(packPath):
         total = os.stat(packPath).st_size
-        test = total if total < 1024*1024*16 else 1024*1024*16
+        test = total if total < 1024*1024*8 else 1024*1024*8
         with open(packPath,'rb') as fp:
-            bytes = fp.read(test)
-            logger.info("{} test read {} bytes success".format(packPath,len(bytes)))
+            fp.seek(total - test)
+            bytes = fp.read()
+            logger.info("{} test read {} bytes by tail success".format(packPath,len(bytes)))
 
     zfp = zipfile.ZipFile(packPath, "a", zipfile.ZIP_DEFLATED)
 
@@ -221,7 +224,7 @@ watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
 os.system("mkdir /tmp/manga")
 os.system("nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &")
 
-for i in range(10):
+for i in range(5):
     logger.info("Waiting for mount onedrive "+str(i))
     sleep(1)
 
