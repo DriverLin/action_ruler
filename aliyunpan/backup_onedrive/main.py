@@ -66,6 +66,7 @@ def rcloneExecutor(cmd, logger):
         res = os.popen("rclone rc core/stats").read()
         try:
             state = json.loads(res)
+            logger.info(json.dumps(state, indent=None))
             speed = int(state["speed"] / 1048576 * 100) / 100#MB/S
             transfered = int(state["bytes"] / 1048576 * 100) / 100#MB
             usedTime = str(int(state["transferTime"]/60)) +"min "+ str(int(state["transferTime"])%60) +"s"    #min
@@ -101,8 +102,8 @@ try:
         time.sleep(1)
     # os.system("chmod 777 ./rclone")
     msg = rcloneExecutor(
-        # "rclone --config ./rclone.conf copy onedrive2: aliyunenc: --rc", logger
-        "rclone --config ./rclone.conf copy onedrive:Manga aliyun:Manga --rc", logger
+        "rclone --config ./rclone.conf copy onedrive2: aliyunenc: --rc", logger
+        # "rclone --config ./rclone.conf copy onedrive:Manga aliyun:Manga --rc", logger
     )
     logger.info("all done!")
 
