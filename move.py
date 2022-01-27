@@ -53,19 +53,25 @@ def singleRepackProcess(instance,workdir):
     start = time()
     downloadCmd = "rclone --config ./rclone.conf  copy 'onedrive:Manga/{}' /tmp/manga ".format(instance["Name"])
     os.system(downloadCmd)
+
+    os.system("ls /tmp/manga")
+
     logger.info("use {:.2f}s to download".format(time() - start))
 
     repack(packPath)
 
+    os.system("ls /tmp/manga")
+
+
     start = time()
     uploadCmd = "rclone --config ./rclone.conf  copy /tmp/manga/{} 'onedrive:MangaS/{}' ".format(instance["Name"][:-4],instance["Name"][:-4])
     os.system(uploadCmd)
+    
+
     logger.info("use {:.2f}s to upload".format(time() - start))
 
     shutil.rmtree(packPath,ignore_errors=True)
     os.remove(packPath)
-
-
 
 def rcloneHandeler():
     po = os.popen("rclone --config ./rclone.conf  lsjson onedrive:Manga")
@@ -75,5 +81,6 @@ def rcloneHandeler():
     os.makedirs(workdir, exist_ok=True)
     for instance in lsres:
         singleRepackProcess(instance,workdir)
+        break
         
 rcloneHandeler()
