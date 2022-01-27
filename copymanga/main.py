@@ -145,7 +145,6 @@ def get_pages(comic_id, chapter_uid, retry=0):
 #             download_img_tozip(url, "{:0>4d}_{:0>4d}.jpg".format(ch['index'] + 1,index+1),zfp,lock)
 #         vthread.vthread.pool.waitall()
 
-
 msg = ""
 def notify_update(mname,update):
     global msg
