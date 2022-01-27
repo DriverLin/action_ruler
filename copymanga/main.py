@@ -193,7 +193,8 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
 
     zfp = zipfile.ZipFile(packPath, "a", zipfile.ZIP_DEFLATED)
 
-    # logger.info(zfp.namelist())
+    start = time()
+    logger.info( "list {} file from zip in {:.2f}s".format(len(zfp.namelist()),time() - start))
 
     lock = threading.Lock()
     
