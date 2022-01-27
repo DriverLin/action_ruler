@@ -59,7 +59,7 @@ jobs:
           KEY: ${{secrets.KEY}}
         run: |
           wget --post-data '{"key": "'$KEY'"}' http://127.0.0.1:8088/api/getRefreshToken -O /tmp/refreshtoken.bin
-          wget  http://127.0.0.1:8088/api/api/aliyunwebdav/latest/url -O /tmp/aliyundavURL
+          wget  http://127.0.0.1:8088/api/aliyunwebdav/latest/url -O /tmp/aliyundavURL
           wget `cat /tmp/aliyundavURL` -O /tmp/aliyunwebdav.jar
           nohup java -jar /tmp/aliyunwebdav.jar --aliyundrive.refresh-token=`cat /tmp/refreshtoken.bin` --server.port=8900 --aliyundrive.auth.enable=false > /dev/null &
 
