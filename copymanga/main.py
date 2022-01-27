@@ -100,12 +100,6 @@ def get_chapters(comic_id, retry=0):
 
 def get_pages(comic_id, chapter_uid, retry=0):
     # 这里可以考虑下持久化 在下载连载中的时候减少读取时间
-    global cache
-    key = "{}_{}".format(comic_id, chapter_uid)
-    if key in cache:
-        logger.info("get_pages from cache " + comic_id + chapter_uid)
-        return cache[key]
-
     imgs = []
     try:
         result = requests.get(
@@ -122,7 +116,6 @@ def get_pages(comic_id, chapter_uid, retry=0):
             index = result["results"]["chapter"]["words"][i]
             imgs.append((url, index))
         logger.info(">" * retry + "get_pages" + comic_id + chapter_uid)
-        cache[key] = imgs
         return imgs
     except Exception as e:
         logger.warning(">" * retry + e.__str__())
@@ -160,60 +153,36 @@ def get_pages(comic_id, chapter_uid, retry=0):
 #         vthread.vthread.pool.waitall()
 
 
-def modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock):
-    for (url, index) in get_pages(manga_id, ch["uuid"]):
-        download_img_tozip(
-            url,
-            "{:0>4d}_{}/{:0>8d}.jpg".format(ch["index"] + 1, ch["name"], index + 1),
-            zfp,
-            lock,
-        )
+def modeSingleZipSplitch(ch, manga_id, saveDir):
+    packPath = os.path.join(saveDir , "{:0>4d}_{}.zip.tmp".format(ch['index'] + 1 ,ch['name']))
+    
+    if os.path.exists(packPath[:-4]):
+        logger.info("downloaded "+packPath[:-4])
+
+    with zipfile.ZipFile(packPath, 'w', zipfile.ZIP_DEFLATED) as zfp:
+        lock = threading.Lock()
+        for (url,index) in get_pages(manga_id,ch['uuid']):
+            download_img_tozip(url,"{:0>8d}.jpg".format(index+1),zfp,lock)
+        vthread.vthread.pool.waitall()
+
+    os.move(packPath,packPath[:-4])
 
 
 def copymanga_download(manga_id, save_name=None, save_path=r"./"):
-    global updateCount,cache
+    global updateCount
     save_name = manga_id if save_name == None else save_name
-    packPath = os.path.join(save_path, "{}.zip".format(save_name))
-
-    chapters = get_chapters(manga_id)
     
-    key = "last_len_of_{}".format(manga_id)
-    if key in cache and cache[key] == len(chapters):
-        logger.warning("{} is already up to date".format(manga_id))
-        return 0#如果章节数不变 则认为没有更新 跳过
+    saveDir = os.path.join(save_path, save_name)
+    os.makedirs(saveDir, exist_ok=True)
 
-    if os.path.exists(packPath):
-        total = os.stat(packPath).st_size
-        test = total if total < 1024*1024*8 else 1024*1024*8
-        start = time()
-        with open(packPath,'rb') as fp:
-            # fp.seek(total - test)
-            bytes = fp.read(test)
-            logger.info("{} test read {} bytes  success in {:.2f}s".format(packPath,len(bytes),time()-start))
-
-    zfp = zipfile.ZipFile(packPath, "a", zipfile.ZIP_DEFLATED)
-
-    start = time()
-    logger.info( "list {} file from zip in {:.2f}s".format(len(zfp.namelist()),time() - start))
-
-    lock = threading.Lock()
-    
     updateCount = 0
     
-    for ch in chapters:
-        modeSingleZipSplitch(ch, manga_id, packPath, zfp, lock)
+    for ch in get_chapters(manga_id):
+        modeSingleZipSplitch(ch, manga_id, saveDir)
     
     vthread.vthread.pool.waitall()
 
-    logger.info("closing...")
-    closeStart = time()
-    zfp.close()
-    logger.info("use {:.2f}s to close".format(time() - closeStart))    
-    cache[key] = len(chapters)#只有在全部完成一次后才会更新章节数记录
-    json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
     return updateCount
-
-
 
 msg = ""
 def notify_update(mid,mname,updates):
@@ -221,7 +190,6 @@ def notify_update(mid,mname,updates):
     msg += "{} 更新了 {} 页\n".format(mname,updates)
 
 #=======================================================================================================================
-cache = json.load(open(r"cache.json", "r", encoding="utf-8"))
 watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
 # os.system("mkdir /tmp/manga")
 # os.system("nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &")
@@ -241,8 +209,6 @@ for (mid,mname) in watchList:
         notify_update(mid,mname,updates)
 
 updateLog += "end time: " + str(datetime.datetime.now()) + "\n"
-
-json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
 
 with open("./log.log" , 'w' , encoding="utf-8") as f:
     f.write(updateLog)

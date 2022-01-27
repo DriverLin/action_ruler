@@ -72,20 +72,20 @@ jobs:
       #     nohup rclone --config ./rclone.conf mount aliyun:Manga  /tmp/manga --vfs-cache-mode full &
       #     sleep 5
 
-      # - name: 挂载onedrive到/mnt/Manga
-      #   env: 
-      #     RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
-      #   run: |
-      #     mkdir /tmp/manga 
-      #     nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &
-      #     sleep 5
+      - name: 挂载onedrive到/mnt/Manga
+        env: 
+          RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
+        run: |
+          mkdir /tmp/manga 
+          nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &
+          sleep 5
 
-      # - name: main
-      #   env:
-      #     KEY: ${{secrets.KEY}}
-      #     RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
-      #   run: python main.py
-      #   working-directory: ./copymanga
+      - name: main
+        env:
+          KEY: ${{secrets.KEY}}
+          RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
+        run: python main.py
+        working-directory: ./copymanga
 
       # - name: report
       #   env:
@@ -107,10 +107,3 @@ jobs:
       #   uses: ad-m/github-push-action@master
       #   with:
       #     github_token: ${{ secrets.GITHUB_TOKEN }}
-
-
-      - name: main
-        env:
-          KEY: ${{secrets.KEY}}
-          RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
-        run: python move.py
