@@ -182,14 +182,14 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
         logger.warning("{} is already up to date".format(manga_id))
         return 0#如果章节数不变 则认为没有更新 跳过
 
-    # if os.path.exists(packPath):
-    #     total = os.stat(packPath).st_size
-    #     test = total if total < 1024*1024*8 else 1024*1024*8
-    #     start = time()
-    #     with open(packPath,'rb') as fp:
-    #         fp.seek(total - test)
-    #         bytes = fp.read()
-    #         logger.info("{} test read {} bytes by tail success in {:.2f}s".format(packPath,len(bytes),time()-start))
+    if os.path.exists(packPath):
+        total = os.stat(packPath).st_size
+        test = total if total < 1024*1024*8 else 1024*1024*8
+        start = time()
+        with open(packPath,'rb') as fp:
+            # fp.seek(total - test)
+            bytes = fp.read(test)
+            logger.info("{} test read {} bytes  success in {:.2f}s".format(packPath,len(bytes),time()-start))
 
     zfp = zipfile.ZipFile(packPath, "a", zipfile.ZIP_DEFLATED)
 
