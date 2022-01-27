@@ -81,6 +81,6 @@ def rcloneHandeler():
     os.makedirs(workdir, exist_ok=True)
     for instance in lsres:
         singleRepackProcess(instance,workdir)
-        break
+        # break
         
 rcloneHandeler()
