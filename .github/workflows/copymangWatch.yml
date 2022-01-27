@@ -72,13 +72,13 @@ jobs:
       #     nohup rclone --config ./rclone.conf mount aliyun:Manga  /tmp/manga --vfs-cache-mode full &
       #     sleep 5
 
-      - name: 挂载onedrive到/mnt/Manga
-        env: 
-          RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
-        run: |
-          mkdir /tmp/manga 
-          nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &
-          sleep 5
+      # - name: 挂载onedrive到/mnt/Manga
+      #   env: 
+      #     RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
+      #   run: |
+      #     mkdir /tmp/manga 
+      #     nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &
+      #     sleep 5
 
       # - name: main
       #   env:
