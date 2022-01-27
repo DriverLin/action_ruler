@@ -204,7 +204,7 @@ def copymanga_download(manga_id, save_name=None, save_path=r"./"):
     closeStart = time()
     zfp.close()
     logger.info("use {:.2f}s to close".format(time() - closeStart))    
-    cache[key] == len(chapters)#只有在全部完成一次后才会更新章节数记录
+    cache[key] = len(chapters)#只有在全部完成一次后才会更新章节数记录
     json.dump(cache, open(r"cache.json", "w", encoding="utf-8"))
     return updateCount
 
