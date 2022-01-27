@@ -46,7 +46,6 @@ def repack(path):
             logger.info('Repacked!'+os.path.join(saveDir,key+'.zip'))      
 
 
-@vthread.pool(3)            
 def singleRepackProcess(instance,workdir):
     logger.info(instance["Name"])
     packPath = os.path.join(workdir,instance["Name"])
