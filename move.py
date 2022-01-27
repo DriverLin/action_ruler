@@ -34,14 +34,14 @@ def singleRepackProcess(instance,workdir):
     packPath = os.path.join(workdir,instance["Name"])
 
     start = time()
-    downloadCmd = "rclone copy 'onedrive:Manga/{}' /tmp/manga ".format(instance["Name"])
+    downloadCmd = "rclone --config ./rclone.conf  copy 'onedrive:Manga/{}' /tmp/manga ".format(instance["Name"])
     os.system(downloadCmd)
     print("use {:.2f}s to download".format(time() - start))
 
     repack(packPath)
 
     start = time()
-    uploadCmd = "rclone copy /tmp/manga/{} 'onedrive:MangaS/{}' ".format(instance["Name"][:-4],instance["Name"][:-4])
+    uploadCmd = "rclone --config ./rclone.conf  copy /tmp/manga/{} 'onedrive:MangaS/{}' ".format(instance["Name"][:-4],instance["Name"][:-4])
     os.system(uploadCmd)
     print("use {:.2f}s to upload".format(time() - start))
 
@@ -51,7 +51,7 @@ def singleRepackProcess(instance,workdir):
 
 
 def rcloneHandeler():
-    po = os.popen("rclone lsjson onedrive:Manga")
+    po = os.popen("rclone --config ./rclone.conf  lsjson onedrive:Manga")
     msg = po.buffer.read().decode('utf-8')
     lsres = json.loads(msg)
     workdir = "/tmp/manga"
