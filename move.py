@@ -4,13 +4,29 @@ import os
 from time import time
 import zipfile
 import shutil
+import coloredlogs
+import logging
+import vthread
+
+
+def getLogger():
+    log = logging.getLogger(f'{"main"}:{"loger"}')
+    fmt = f"%(asctime)s.%(msecs)03d .%(levelname)s \t%(message)s"
+    coloredlogs.install(
+        level=logging.DEBUG, logger=log, milliseconds=True, datefmt="%X", fmt=fmt
+    )
+    log.info("Loger initialized")
+    return log
+
+logger = getLogger()
+
 #在zip文件同目录下生成文件夹 里面是分开压缩的多个压缩包
 def repack(path):
     if not path.endswith('.zip'):
-        print("error! not a zip file")
+        logger.info("error! not a zip file")
         return
 
-    print('Repacking...',path)
+    logger.info('Repacking...'+path)
     saveDir = path[:-4]
     os.makedirs(saveDir, exist_ok=True)
     with zipfile.ZipFile(path, 'r') as zipf:
@@ -27,23 +43,25 @@ def repack(path):
             with zipfile.ZipFile(os.path.join(saveDir,key+'.zip'),'w',zipfile.ZIP_DEFLATED) as chzfp:
                 for file in files:
                     chzfp.writestr(file,zipf.read(file))
-            print('Repacked!'+os.path.join(saveDir,key+'.zip'))      
+            logger.info('Repacked!'+os.path.join(saveDir,key+'.zip'))      
 
+
+@vthread.pool(3)            
 def singleRepackProcess(instance,workdir):
-    print(instance["Name"])
+    logger.info(instance["Name"])
     packPath = os.path.join(workdir,instance["Name"])
 
     start = time()
     downloadCmd = "rclone --config ./rclone.conf  copy 'onedrive:Manga/{}' /tmp/manga ".format(instance["Name"])
     os.system(downloadCmd)
-    print("use {:.2f}s to download".format(time() - start))
+    logger.info("use {:.2f}s to download".format(time() - start))
 
     repack(packPath)
 
     start = time()
     uploadCmd = "rclone --config ./rclone.conf  copy /tmp/manga/{} 'onedrive:MangaS/{}' ".format(instance["Name"][:-4],instance["Name"][:-4])
     os.system(uploadCmd)
-    print("use {:.2f}s to upload".format(time() - start))
+    logger.info("use {:.2f}s to upload".format(time() - start))
 
     shutil.rmtree(packPath,ignore_errors=True)
     os.remove(packPath)
@@ -58,6 +76,5 @@ def rcloneHandeler():
     os.makedirs(workdir, exist_ok=True)
     for instance in lsres:
         singleRepackProcess(instance,workdir)
-        break
         
 rcloneHandeler()
