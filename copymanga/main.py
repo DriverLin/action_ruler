@@ -51,24 +51,20 @@ def download_img(url, path):
 @vthread.pool(16)
 def download_img_tozip(url, name, zfp, write_lock):
     global updateCount
-    if name in zfp.namelist():
-        # logger.info("pass"+name)
-        pass
-    else:
-        retry = 0
-        while True:
-            try:
-                bytes = requests.get(url, stream=True,timeout=5).content
-                write_lock.acquire()
-                zfp.writestr(name, bytes)
-                updateCount += 1
-                write_lock.release()
-                logger.info(">" * retry + "success : "+ name)
-                break
-            except Exception as e:
-                logger.warning(">" * retry + "error! : " + name+ "\t"+ e.__str__())
-                retry += 1
-                sleep(1)
+    retry = 0
+    while True:
+        try:
+            bytes = requests.get(url, stream=True,timeout=5).content
+            write_lock.acquire()
+            zfp.writestr(name, bytes)
+            updateCount += 1
+            write_lock.release()
+            logger.info(">" * retry + "success : "+zfp.filename+":"+ name)
+            break
+        except Exception as e:
+            logger.warning(">" * retry + "error! : "+zfp.filename+":"+ name+ "\t"+ e.__str__())
+            retry += 1
+            sleep(1)
 
 
 def get_chapters(comic_id, retry=0):
