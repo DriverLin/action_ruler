@@ -21,7 +21,6 @@ def getLogger():
     log.info("Loger initialized")
     return log
 
-updateCount = 0
 logger = getLogger()
 
 
@@ -50,14 +49,12 @@ def download_img(url, path):
 
 @vthread.pool(16)
 def download_img_tozip(url, name, zfp, write_lock):
-    global updateCount
     retry = 0
     while True:
         try:
             bytes = requests.get(url, stream=True,timeout=5).content
             write_lock.acquire()
             zfp.writestr(name, bytes)
-            updateCount += 1
             write_lock.release()
             logger.info(">" * retry + "success : "+zfp.filename+":"+ name)
             break
@@ -149,12 +146,19 @@ def get_pages(comic_id, chapter_uid, retry=0):
 #         vthread.vthread.pool.waitall()
 
 
-def modeSingleZipSplitch(ch, manga_id, saveDir):
+msg = ""
+def notify_update(mname,update):
+    global msg
+    msg += "{}更新到{}\n".format(mname,update)
+
+def modeSingleZipSplitch(ch, manga_id, manga_name,saveDir):
     packPath = os.path.join(saveDir , "{:0>4d}_{}.zip.tmp".format(ch['index'] + 1 ,ch['name']))
     
     if os.path.exists(packPath[:-4]):
         logger.info("downloaded "+packPath[:-4])
         return
+
+    notify_update(manga_name,ch['name'])
 
     with zipfile.ZipFile(packPath, 'w', zipfile.ZIP_DEFLATED) as zfp:
         lock = threading.Lock()
@@ -165,26 +169,17 @@ def modeSingleZipSplitch(ch, manga_id, saveDir):
     shutil.move(packPath,packPath[:-4])
 
 
-def copymanga_download(manga_id, save_name=None, save_path=r"./"):
-    global updateCount
-    save_name = manga_id if save_name == None else save_name
+def copymanga_download(manga_id, manga_name=None, save_path=r"./"):
+    manga_name = manga_id if manga_name == None else manga_name
     
-    saveDir = os.path.join(save_path, save_name)
+    saveDir = os.path.join(save_path, manga_name)
     os.makedirs(saveDir, exist_ok=True)
-
-    updateCount = 0
     
     for ch in get_chapters(manga_id):
-        modeSingleZipSplitch(ch, manga_id, saveDir)
+        modeSingleZipSplitch(ch, manga_id,manga_name, saveDir)
     
     vthread.vthread.pool.waitall()
 
-    return updateCount
-
-msg = ""
-def notify_update(mid,mname,updates):
-    global msg
-    msg += "{} 更新了 {} 页\n".format(mname,updates)
 
 #=======================================================================================================================
 watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
@@ -195,20 +190,9 @@ watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
 #     sleep(1)
 
 
-updateLog = "start time: " + str(datetime.datetime.now()) + "\n"
-
 for (mid,mname) in watchList:
     logger.info("Start download "+mid+" "+mname)
-    updates = copymanga_download(mid, mname, "/tmp/manga")
-    logger.info("{} Update {} pages".format(mname,updates))
-    updateLog += "{} Update {} pages\n".format(mname,updates)
-    if updates > 0:
-        notify_update(mid,mname,updates)
-
-updateLog += "end time: " + str(datetime.datetime.now()) + "\n"
-
-with open("./log.log" , 'w' , encoding="utf-8") as f:
-    f.write(updateLog)
+    copymanga_download(mid, mname, "/tmp/manga")
 
 if msg == "":
     pass

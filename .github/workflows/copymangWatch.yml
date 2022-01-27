@@ -87,13 +87,13 @@ jobs:
         run: python main.py
         working-directory: ./copymanga
 
-      # - name: report
-      #   env:
-      #     TOKEN: ${{secrets.MACRODROID_TOKEN}}
-      #     TAG: 'important'
-      #     TITLE: '漫画更新了'
-      #     MSGCHECK: "TRUE"
-      #   run: python report_macrodroid.py
+      - name: report
+        env:
+          TOKEN: ${{secrets.MACRODROID_TOKEN}}
+          TAG: 'important'
+          TITLE: '漫画更新了'
+          MSGCHECK: "TRUE"
+        run: python report_macrodroid.py
       
       # - name: commit
       #   run: |
