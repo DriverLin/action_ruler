@@ -158,6 +158,7 @@ def modeSingleZipSplitch(ch, manga_id, saveDir):
     
     if os.path.exists(packPath[:-4]):
         logger.info("downloaded "+packPath[:-4])
+        return
 
     with zipfile.ZipFile(packPath, 'w', zipfile.ZIP_DEFLATED) as zfp:
         lock = threading.Lock()
@@ -165,7 +166,7 @@ def modeSingleZipSplitch(ch, manga_id, saveDir):
             download_img_tozip(url,"{:0>8d}.jpg".format(index+1),zfp,lock)
         vthread.vthread.pool.waitall()
 
-    os.move(packPath,packPath[:-4])
+    shutil.move(packPath,packPath[:-4])
 
 
 def copymanga_download(manga_id, save_name=None, save_path=r"./"):
