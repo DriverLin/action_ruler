@@ -149,7 +149,7 @@ def get_pages(comic_id, chapter_uid, retry=0):
 msg = ""
 def notify_update(mname,update):
     global msg
-    msg += "{}更新到{}\n".format(mname,update)
+    msg += "《{}》更新到{}\n".format(mname,update)
 
 def modeSingleZipSplitch(ch, manga_id, manga_name,saveDir):
     packPath = os.path.join(saveDir , "{:0>4d}_{}.zip.tmp".format(ch['index'] + 1 ,ch['name']))
