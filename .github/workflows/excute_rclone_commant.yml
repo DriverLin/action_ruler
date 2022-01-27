@@ -8,6 +8,11 @@ on:
   repository_dispatch:
     types:
       - excuterclone
+    inputs:
+    name:
+      description: 'Person to greet'
+      required: true
+      default: 'Mona the Octocat'
   #     #远程触发backupnow
   # schedule:
   #     - cron: '00 22 * * *'
@@ -68,5 +73,6 @@ jobs:
         env: 
           RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
         run: |
-          rclone --config ./rclone.conf ls aliyunenc:
+          echo 'running'${{github.event.client_payload.cmd}}
+          rclone --config ./rclone.conf ${{ github.event.client_payload.cmd}}
 
