@@ -223,8 +223,8 @@ def notify_update(mid,mname,updates):
 #=======================================================================================================================
 cache = json.load(open(r"cache.json", "r", encoding="utf-8"))
 watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
-os.system("mkdir /tmp/manga")
-os.system("nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &")
+# os.system("mkdir /tmp/manga")
+# os.system("nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &")
 
 for i in range(5):
     logger.info("Waiting for mount onedrive "+str(i))
