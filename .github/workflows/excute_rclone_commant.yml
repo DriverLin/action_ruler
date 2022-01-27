@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types:
-      - excuterclone
+      -  
   #     #远程触发backupnow
   # schedule:
   #     - cron: '00 22 * * *'
@@ -68,6 +68,6 @@ jobs:
         env: 
           RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
         run: |
-          echo 'running'${{github.event.client_payload.cmd}}
+          echo 'running rclone '${{github.event.client_payload.cmd}}
           rclone --config ./rclone.conf ${{ github.event.client_payload.cmd}}
 
