@@ -77,7 +77,7 @@ jobs:
           RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
         run: |
           mkdir /tmp/manga 
-          nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode full &
+          nohup rclone --config ./rclone.conf mount onedrive:Manga  /tmp/manga --vfs-cache-mode writes &
           sleep 5
 
       - name: main
