@@ -23,7 +23,7 @@ logger = getLogger()
 #在zip文件同目录下生成文件夹 里面是分开压缩的多个压缩包
 def repack(path):
     if not path.endswith('.zip'):
-        logger.info("error! not a zip file")
+        logger.info(path+" error! not a zip file")
         return
 
     logger.info('Repacking...'+path)
