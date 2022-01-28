@@ -48,4 +48,4 @@ res = listAll(r"/tmp/manga")
 for file in res:
     logger.info(file)
     repackProcess(file)
-    vthread.vthread.pool.waitall()
+vthread.vthread.pool.waitall()
