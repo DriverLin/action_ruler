@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types:
-      -  
+      - excuterclone
   #     #远程触发backupnow
   # schedule:
   #     - cron: '00 22 * * *'

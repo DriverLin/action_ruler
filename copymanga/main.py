@@ -44,7 +44,8 @@ def listAll(path):
                 result.append(os.path.join(root,file))
     return result
 
-res = listAll(r"P:\pointer\堀与宫村")
+res = listAll(r"/tmp/manga")
 for file in res:
     logger.info(file)
-    repackProcess  (file)
+    repackProcess(file)
+    vthread.vthread.pool.waitall()
