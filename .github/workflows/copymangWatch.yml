@@ -10,10 +10,10 @@ on:
   #     - updateManga
   #     #远程触发backupnow
   schedule:
-      #- cron: '00 22 * * *'
-      #- cron: '00 3 * * *'
-      #- cron: '00 9 * * *'
-      #- cron: '00 14 * * *'
+      - cron: '00 22 * * *'
+      - cron: '00 3 * * *'
+      - cron: '00 9 * * *'
+      - cron: '00 14 * * *'
       #快8小时
   # Triggers the workflow on push or pull request events but only for the main branch
   # push:
