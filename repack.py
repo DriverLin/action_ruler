@@ -1,6 +1,5 @@
 import os
 import json
-from struct import pack
 import zipfile
 import shutil
 import coloredlogs
@@ -44,7 +43,7 @@ def listAll(path):
                 result.append(os.path.join(root,file))
     return result
 
-res = listAll(r"P:\pointer\堀与宫村")
+res = listAll(r"/tmp/manga")
 for file in res:
-    logger.info(file)
+    logger.info("list : "+file)
     repackProcess  (file)
