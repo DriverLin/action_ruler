@@ -47,3 +47,4 @@ res = listAll(r"/tmp/manga")
 for file in res:
     logger.info("list : "+file)
     repackProcess  (file)
+    vthread.vthread.pool.waitall()
