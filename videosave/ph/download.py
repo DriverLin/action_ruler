@@ -17,7 +17,7 @@ def downloadByViewkey(savePath,viewKey):
         ydl.download(["https://www.pornhub.com/view_video.php?viewkey=" + viewKey])
     shutil.move(tmpPath,savePath)
 
-downloadList = json.load(open("/tmp/downloadList.json",'r',encoding="UTF-8"))
+downloadList = json.load(open("/tmp/needDownload.json",'r',encoding="UTF-8"))
 
 for (name,vk,savedir) in downloadList:
     print(name,vk)
