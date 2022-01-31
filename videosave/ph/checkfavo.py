@@ -106,7 +106,7 @@ def getPlaylist(listid):
     print(len(res))
     return res
 
-savedList = os.listdir("/tmp/ADM/Short")
+savedList = os.listdir("/tmp/ADM/short")
 print("savedList",savedList)
 videoList = getPlaylist(220875701)
 print("videoList",videoList)
@@ -115,4 +115,4 @@ print(len(downloadList),downloadList)
 
 for (name,vk) in downloadList:
     print(name,vk)
-    downloadByViewkey( os.path.join("/tmp/ADM/Short",name+".mp4")   ,vk)
+    downloadByViewkey( os.path.join("/tmp/ADM/short",name+".mp4")   ,vk)
