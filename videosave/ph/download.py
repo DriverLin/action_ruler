@@ -2,7 +2,9 @@ import json
 import shutil
 import os
 import youtube_dl
+import vthread
 
+@vthread.pool(8)
 def downloadByViewkey(savePath,viewKey):
 
     tmpPath = os.path.join("/tmp",viewKey+".tmp")
@@ -20,3 +22,5 @@ downloadList = json.load(open("/tmp/downloadList.json",'r',encoding="UTF-8"))
 for (name,vk,savedir) in downloadList:
     print(name,vk)
     downloadByViewkey( os.path.join(savedir,name+".mp4")   ,vk)
+
+vthread.vthread.pool.waitall()

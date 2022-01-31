@@ -4,7 +4,6 @@ import bs4
 import re
 import os
 
-
 def validateTitle(title):
     # 去除文件名中的非法字符
     rstr = r"[\/\\\:\*\?\"\<\>\|]"  # '/ \ : * ? " < > |'

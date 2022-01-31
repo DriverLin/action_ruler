@@ -49,7 +49,7 @@ jobs:
           nohup rclone --config ./rclone.conf mount onedrive2:ADM  /tmp/ADM --vfs-cache-mode full &
 
       - name: 安装python包
-        run: pip install requests beautifulsoup4 youtube-dl
+        run: pip install requests beautifulsoup4 youtube-dl vthread
 
       - name: run main
         run: python check.py
