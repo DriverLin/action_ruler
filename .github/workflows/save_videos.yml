@@ -26,20 +26,13 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      # - name: Setup Java JDK
       #   uses: actions/setup-java@v2.5.0
       #   with:
       #     distribution: 'temurin' # See 'Supported distributions' for available options
       #     java-version: '17'
-          
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
@@ -48,10 +41,7 @@ jobs:
       - name: 安装rclone
         run: sudo apt-get install -y rclone
 
-      # - name: 安装ffmpeg
-      #   run: sudo apt-get install -y ffmpeg  
-
-      - name: 挂载onedrive2到/mnt/ADM
+      - name: 挂载onedrive2/ADM到/mnt/ADM
         env: 
           RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
         run: |
@@ -62,7 +52,7 @@ jobs:
         run: pip install requests beautifulsoup4 youtube-dl
 
       - name: run main
-        run: python checkfavo.py
+        run: python check.py
         working-directory: ./videosave/ph
 
       - name: Check file existence
@@ -73,15 +63,16 @@ jobs:
 
       - name: File exists
         if: steps.check_files.outputs.files_exists == 'true'
-        # Only runs if all of the files exists
         run: echo All files exists!
-      
-      - name: File not exists
-        if: steps.check_files.outputs.files_exists != 'true'
-        # Only runs if all of the files exists
-        run: echo no exists!
-      
 
+      - name: 安装ffmpeg
+        if: steps.check_files.outputs.files_exists == 'true'
+        run: sudo apt-get install -y ffmpeg  
+      
+      - name: 下载
+        if: steps.check_files.outputs.files_exists == 'true'
+        run: python download.py
+        working-directory: ./videosave/ph
 
       # - name: 启动api服务器
       #   run: nohup python api_server.py &
