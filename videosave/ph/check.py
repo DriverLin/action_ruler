@@ -37,16 +37,21 @@ def getPlaylist(listid, savepath):
     print(len(res))
     return res
 
-
+saveMap = json.load(open("saveMap.json",'r',encoding="UTF-8"))
 needDownload = []
-for lid, path in [(220875701,"/tmp/ADM/short"),(220876141,"/tmp/ADM/3D")]:
+for lid, path in saveMap:
     videoList = getPlaylist(lid, path)
     downloaded = [x[:-4] for x in os.listdir(path)]
+    
+    print(f"list {lid} has {len(videoList)} videos")
+    print(f"path{path} has {len(downloaded)} download videos")
+    print(f"need download {len(videoList) - len(downloaded)} videos")
+
     for video in videoList:
         if video[0] not in downloaded:
             needDownload.append(video)
 
-print(len(needDownload), needDownload)
+print(f"total {len(needDownload)} videos need download")
 
 if len(needDownload) > 0:
     with open("/tmp/needDownload.json", "w", encoding="UTF-8") as f:
