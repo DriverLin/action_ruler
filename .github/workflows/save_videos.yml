@@ -5,10 +5,10 @@ on:
   # watch:
   #   types: started
   workflow_dispatch:
-  # repository_dispatch:
-  #   types:
-  #     - excuterclone
-  #     #远程触发backupnow
+  repository_dispatch:
+    types:
+      - savevideos
+      #远程触发backupnow
   schedule:
       - cron: '00 22 * * *' #每天早晨6点一次 主要靠手动触发
       # - cron: '00 3 * * *'
