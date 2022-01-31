@@ -48,8 +48,8 @@ jobs:
       - name: 安装rclone
         run: sudo apt-get install -y rclone
 
-      - name: 安装ffmpeg
-        run: sudo apt-get install -y ffmpeg  
+      # - name: 安装ffmpeg
+      #   run: sudo apt-get install -y ffmpeg  
 
       - name: 挂载onedrive2到/mnt/ADM
         env: 
@@ -65,6 +65,22 @@ jobs:
         run: python checkfavo.py
         working-directory: ./videosave/ph
 
+      - name: Check file existence
+        id: check_files
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "/tmp/downloadList.json"
+
+      - name: File exists
+        if: steps.check_files.outputs.files_exists == 'true'
+        # Only runs if all of the files exists
+        run: echo All files exists!
+      
+      - name: File not exists
+        if: steps.check_files.outputs.files_exists != 'true'
+        # Only runs if all of the files exists
+        run: echo no exists!
+      
 
 
       # - name: 启动api服务器
