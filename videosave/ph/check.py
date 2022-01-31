@@ -20,9 +20,9 @@ def getPlaylist(listid, savepath):
         .select_one("#searchInput")
         .get("data-token")
     )
-    print(data_token)
+    # print(data_token)
     url = f"https://www.pornhub.com/playlist/viewChunked?id={listid}&token={data_token}&page={0}"
-    print(url)
+    # print(url)
     response = session.get(url)
     res = [
         (
@@ -34,7 +34,7 @@ def getPlaylist(listid, savepath):
             "span.title > a"
         )
     ]
-    print(len(res))
+    # print(len(res))
     return res
 
 saveMap = json.load(open("saveMap.json",'r',encoding="UTF-8"))
@@ -55,7 +55,6 @@ print(f"total {len(needDownload)} videos need download")
 if len(needDownload) > 0:
     print("downloading...")
     for name, vk, savedir in needDownload:
-        print(name, vk)
+        print(f"{name} {vk} > {savedir}")
     with open("/tmp/needDownload.json", "w", encoding="UTF-8") as f:
         json.dump(needDownload, f)
-        
