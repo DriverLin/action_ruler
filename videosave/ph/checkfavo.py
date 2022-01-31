@@ -77,7 +77,7 @@ def downloadByViewkey(savePath,viewKey):
     tmpPath = os.path.join("/tmp",viewKey+".tmp")
     ydl_opts = {
         "nooverwrites": True,
-        "outtmpl": savePath,
+        "outtmpl": tmpPath,
         "format": "best",
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -107,9 +107,9 @@ def getPlaylist(listid):
     return res
 
 savedList = os.listdir("/tmp/ADM/short")
-print("savedList",savedList)
+# print("savedList",savedList)
 videoList = getPlaylist(220875701)
-print("videoList",videoList)
+# print("videoList",videoList)
 downloadList = [entry for entry in videoList if entry[0] not in savedList]
 print(len(downloadList),downloadList)
 
