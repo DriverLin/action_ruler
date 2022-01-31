@@ -1,3 +1,6 @@
+import hashlib
+import json
+import shutil
 import requests
 import bs4
 import re
@@ -70,6 +73,8 @@ def validateTitle(title):
 
 
 def downloadByViewkey(savePath,viewKey):
+
+    tmpPath = os.path.join("/tmp",viewKey+".tmp")
     ydl_opts = {
         "nooverwrites": True,
         "outtmpl": savePath,
@@ -77,7 +82,7 @@ def downloadByViewkey(savePath,viewKey):
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download(["https://www.pornhub.com/view_video.php?viewkey=" + viewKey])
-
+    shutil.move(tmpPath,savePath)
 
 def getPlaylist(listid):
     session = requests.Session()
@@ -101,12 +106,14 @@ def getPlaylist(listid):
     print(len(res))
     return res
 
-    
-print("listing adm")
-for file in os.walk("/tmp/ADM"):
-    print(file)
+def exec(cmd:str):
+    pip = os.popen(cmd)
+    return pip.buffer.read().decode(encoding='utf8')
+savedList = [entry["Name"][:-4] for entry in json.loads(exec("rclone lsjson onedrive2:ADM/short"))]
+videoList = getPlaylist(220875701)
+downloadList = [entry for entry in videoList if entry[0] not in savedList]
+print(len(downloadList),downloadList)
 
-favos = getPlaylist(220875701)
-for (name,vk) in favos:
+for (name,vk) in downloadList:
     print(name,vk)
     downloadByViewkey( os.path.join("/tmp/ADM/Short",name+".mp4")   ,vk)
