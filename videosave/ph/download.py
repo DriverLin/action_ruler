@@ -47,7 +47,6 @@ def downloadByViewkey(savePath,viewKey):
 downloadList = json.load(open("/tmp/needDownload.json",'r',encoding="UTF-8"))
 
 for (name,vk,savedir) in downloadList:
-    print(name,vk)
     downloadByViewkey( os.path.join(savedir,name+".mp4")   ,vk)
 
 vthread.vthread.pool.waitall()
