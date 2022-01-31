@@ -32,12 +32,14 @@ def getPlaylist(listid):
     print(len(res))
     return res
 
-savedList = os.listdir("/tmp/ADM/short")
-# print("savedList",savedList)
+savedList =[x[:-4] for x in  os.listdir("/tmp/ADM/short")]
+# print("savedList",json.dumps( sorted(savedList)  ,indent=2,ensure_ascii=False))
 videoList = getPlaylist(220875701)
 # print("videoList",videoList)
 downloadList = [entry for entry in videoList if entry[0] not in savedList]
+
 print(len(downloadList),downloadList)
+
 if len(downloadList) > 0:
     with open ("/tmp/downloadList.json",'w',encoding="UTF-8") as f:
         json.dump(downloadList,f)

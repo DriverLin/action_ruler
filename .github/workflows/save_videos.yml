@@ -60,11 +60,7 @@ jobs:
         uses: andstor/file-existence-action@v1
         with:
           files: "/tmp/downloadList.json"
-
-      - name: File exists
-        if: steps.check_files.outputs.files_exists == 'true'
-        run: echo All files exists!
-
+          
       - name: 安装ffmpeg
         if: steps.check_files.outputs.files_exists == 'true'
         run: sudo apt-get install -y ffmpeg  
