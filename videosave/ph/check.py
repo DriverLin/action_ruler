@@ -42,17 +42,20 @@ needDownload = []
 for lid, path in saveMap:
     videoList = getPlaylist(lid, path)
     downloaded = [x[:-4] for x in os.listdir(path)]
+    need = [x for x in videoList if x[0] not in downloaded]
     
     print(f"list {lid} has {len(videoList)} videos")
     print(f"path{path} has {len(downloaded)} download videos")
-    print(f"need download {len(videoList) - len(downloaded)} videos")
+    print(f"need download {len(need)} videos")
 
-    for video in videoList:
-        if video[0] not in downloaded:
-            needDownload.append(video)
+    needDownload.extend(need)
 
 print(f"total {len(needDownload)} videos need download")
 
 if len(needDownload) > 0:
+    print("downloading...")
+    for name, vk, savedir in needDownload:
+        print(name, vk)
     with open("/tmp/needDownload.json", "w", encoding="UTF-8") as f:
         json.dump(needDownload, f)
+        
