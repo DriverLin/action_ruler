@@ -101,7 +101,12 @@ def getPlaylist(listid):
     print(len(res))
     return res
 
+    
+print("listing adm")
+for file in os.walk("/tmp/ADM"):
+    print(file)
+
 favos = getPlaylist(220875701)
 for (name,vk) in favos:
     print(name,vk)
-    downloadByViewkey(name+".mp4",vk)
+    downloadByViewkey( os.path.join("/tmp/ADM/Short",name+".mp4")   ,vk)

@@ -44,9 +44,16 @@ jobs:
         with:
           python-version: '3.8'
           architecture: 'x64'
-      
-      # - name: 安装rclone
-      #   run: sudo apt-get install -y rclone
+
+      - name: 安装rclone
+        run: sudo apt-get install -y rclone
+
+      - name: 挂载onedrive2到/mnt/ADM
+        env: 
+          RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
+        run: |
+          mkdir /tmp/ADM
+          nohup rclone --config ./rclone.conf mount onedrive2:ADM  /tmp/ADM --vfs-cache-mode full &
 
       - name: 安装python包
         run: pip install requests beautifulsoup4 youtube-dl
@@ -54,6 +61,7 @@ jobs:
       - name: run main
         run: python checkfavo.py
         working-directory: ./videosave/ph
+
 
 
       # - name: 启动api服务器
