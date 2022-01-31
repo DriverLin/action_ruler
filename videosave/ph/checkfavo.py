@@ -106,11 +106,10 @@ def getPlaylist(listid):
     print(len(res))
     return res
 
-def exec(cmd:str):
-    pip = os.popen(cmd)
-    return pip.buffer.read().decode(encoding='utf8')
-savedList = [entry["Name"][:-4] for entry in json.loads(exec("rclone lsjson onedrive2:ADM/short"))]
+savedList = os.listdir("/tmp/ADM/Short")
+print("savedList",savedList)
 videoList = getPlaylist(220875701)
+print("videoList",videoList)
 downloadList = [entry for entry in videoList if entry[0] not in savedList]
 print(len(downloadList),downloadList)
 
