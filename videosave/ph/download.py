@@ -19,4 +19,4 @@ downloadList = json.load(open("/tmp/downloadList.json",'r',encoding="UTF-8"))
 
 for (name,vk,savedir) in downloadList:
     print(name,vk)
-    downloadByViewkey( os.path.join("/tmp/ADM/short",name+".mp4")   ,vk)
+    downloadByViewkey( os.path.join(savedir,name+".mp4")   ,vk)
