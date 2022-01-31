@@ -22,7 +22,7 @@ def my_hook(d):
 
 @vthread.pool(8)
 def downloadByViewkey(savePath,viewKey):
-
+    print(f"downloading {savePath}")
     tmpPath = os.path.join("/tmp",viewKey+".tmp")
     ydl_opts = {
         "nooverwrites": True,
@@ -42,7 +42,7 @@ def downloadByViewkey(savePath,viewKey):
     start = time()
     shutil.move(tmpPath,savePath)
     usingtime = time() - start
-    print("{} move over , speed = {:.2f}s".format(savePath,size/usingtime/1024/1024))    
+    print("{} move over , speed = {:.2f}mb/s".format(savePath,size/usingtime/1024/1024))    
 
 downloadList = json.load(open("/tmp/needDownload.json",'r',encoding="UTF-8"))
 
