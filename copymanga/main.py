@@ -4,12 +4,13 @@ import os
 import shutil
 import threading
 import zipfile
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor,wait,as_completed,FIRST_COMPLETED,ALL_COMPLETED
 from time import sleep, time
 
 import coloredlogs
 import requests
 
+requests.packages.urllib3.disable_warnings()
 
 class packer:
     def __init__(self, save_dir, save_name, picQuiet=False, notifyer=None) -> None:
@@ -27,9 +28,9 @@ class packer:
 
     def _download(self, url, name, zfp, write_lock):
         retry = 0
-        while True:
+        while retry < 5:
             try:
-                bytes = requests.get(url, stream=True, timeout=5).content
+                bytes = requests.get(url, stream=True, timeout=5,verify=False).content
                 write_lock.acquire()
                 zfp.writestr(name, bytes)
                 write_lock.release()
@@ -42,11 +43,11 @@ class packer:
                         self.logger.info(
                             ">" * retry + "success : " + zfp.filename + ":" + name
                         )
-                break
+                return True
             except Exception as e:
                 self.logger.warning(
                     "> " * retry
-                    + "error! : "
+                    + "retrying : "
                     + zfp.filename
                     + ":"
                     + name
@@ -55,9 +56,11 @@ class packer:
                 )
                 retry += 1
                 sleep(1)
+        self.logger.error("max retry reached : " + zfp.filename + ":" + name)
+        return False
 
     def downloadCh(
-        self, ch_index, ch_name, get_url_Closure, max_workers=8
+        self, ch_index, ch_name, get_pics, max_workers=8
     ):  # index 记得从1开始
         pack_name = "{:0>4d}_{}".format(ch_index, ch_name)
         pack_tmp_path = os.path.join(self.save_dir, pack_name + ".zip.tmp")
@@ -65,38 +68,46 @@ class packer:
         if os.path.exists(pack_path):
             self.logger.warning("passed " + pack_name)
             return
-        # self.logger.info("start downloaded "+pack_name)
         write_lock = threading.Lock()
-        urls = get_url_Closure()
+        urls = get_pics()
+        self.logger.info(f"start downloaded {pack_name} { len(urls)}p")
         size = 0
         timeUsed = 0
+        success = True
         with zipfile.ZipFile(
             pack_tmp_path, "w", compression=zipfile.ZIP_DEFLATED
         ) as zfp:
             excuter = ThreadPoolExecutor(max_workers=max_workers)
             start = time()
-            for index, url in enumerate(urls):
-                excuter.submit(
+            all_task = [excuter.submit(
                     self._download,
                     url,
                     "{:0>8d}.jpg".format(index + 1),
                     zfp,
                     write_lock,
-                )
-            excuter.shutdown(wait=True)
+                )  for index, url in enumerate(urls)]
+            # excuter.shutdown(wait=True)
+            wait (all_task, return_when=ALL_COMPLETED)
+            for future in as_completed (all_task):
+                data = future.result ()
+                # print (data)
+                success = success and data
             timeUsed = time() - start
             size = sum([zinfo.file_size for zinfo in zfp.filelist]) / 1048576
 
-        shutil.move(pack_tmp_path, pack_path)
-
-        if self.notifyer:
-            self.notifyer(self.save_name, ch_name)
-
-        finishInfo = "{} finish \t{:.2f}mb in {:.2f}s speed={:.2f}mb/s".format(
-            pack_name, size, timeUsed, size / timeUsed
-        )
-
-        self.logger.info(finishInfo)
+        if success:#成功才会保存zip 因此只要zip文件存在 则认为里面的内容是正确的
+            shutil.move(pack_tmp_path, pack_path)
+            finishInfo = "{} finish \t{:.2f}mb in {:.2f}s speed={:.2f}mb/s".format(
+                pack_name, size, timeUsed, size / timeUsed
+            )
+            self.logger.info(finishInfo)
+            if self.notifyer:
+                self.notifyer(self.save_name, ch_name)
+        else:#失败报错并删除zip
+            os.remove(pack_tmp_path) if os.path.exists(pack_tmp_path) else None
+            finishInfo = "{} failed  {:.2f}s ".format(pack_path,  timeUsed)
+            self.logger.error(finishInfo)
+        return success
 
 
 def getLogger():
@@ -140,7 +151,6 @@ def get_chapters(manga_id, retry=0):
 
 def get_Urls(manga_id, chapter_uid, retry=0):
     # 这里可以考虑下持久化 在下载连载中的时候减少读取时间
-    imgs = []
     try:
         result = requests.get(
             "https://api.copymanga.com/api/v3/comic/{}/chapter2/{}?platform=3".format(
@@ -151,10 +161,17 @@ def get_Urls(manga_id, chapter_uid, retry=0):
         assert len(result["results"]["chapter"]["contents"]) == len(
             result["results"]["chapter"]["words"]
         )
+        # for i in range(len(result["results"]["chapter"]["contents"])):
+        #     url = result["results"]["chapter"]["contents"][i]["url"]
+        #     # index = result["results"]["chapter"]["words"][i]
+        #     imgs.append(url)
+
+        imgs = ["" for x in range(len(result["results"]["chapter"]["contents"]))]
         for i in range(len(result["results"]["chapter"]["contents"])):
             url = result["results"]["chapter"]["contents"][i]["url"]
-            # index = result["results"]["chapter"]["words"][i]
-            imgs.append(url)
+            index = int(result["results"]["chapter"]["words"][i])
+            imgs[index] = url
+
         # logger.info(">" * retry + "get_Urls" + manga_id + chapter_uid)
         return imgs
     except Exception as e:
@@ -163,31 +180,32 @@ def get_Urls(manga_id, chapter_uid, retry=0):
         return get_Urls(manga_id, chapter_uid, retry + 1)
 
 
-msg = ""
+msg = "漫画更新提示:"
 
 def notify_update(mname, update):
     global msg
-    msg += "《{}》更新到{}\n".format(mname, update)
+    msg += "\n《{}》更新到{}".format(mname, update)
 
 def copymanga_download(manga_id, manga_name=None, save_path=r"./"):
     manga_name = manga_id if manga_name == None else manga_name
-    pa = packer(save_path, manga_name, picQuiet=True, notifyer=notify_update)
+    pa = packer(save_path, manga_name, picQuiet=False, notifyer=notify_update)
     for index, ch in enumerate(get_chapters(manga_id)):
+        # logger.info(  json.dumps(get_Urls(manga_id, ch["uuid"]),indent=4)  )
         pa.downloadCh(
             ch_index=index + 1,
             ch_name=ch["name"],
-            get_url_Closure=lambda: get_Urls(manga_id, ch["uuid"]),
-        )
+            get_pics=lambda: get_Urls(manga_id, ch["uuid"]),
+        )   
 
 if __name__ == "__main__":
-    
     watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
-
     for (mid, mname) in watchList:
-        
         logger.info("Start download " + mid + " " + mname)
-
         copymanga_download(mid, mname, "/tmp/manga")
-        # copymanga_download(mid, mname, "D:\\漫画")
-
     open("/tmp/msg", "w", encoding="UTF-8").write(msg) if len(msg) > 0 else None
+
+    # watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
+    # for (mid, mname) in watchList[:1]:
+    #     logger.info("Start download " + mid + " " + mname)
+    #     # copymanga_download(mid, mname, "/tmp/manga")
+    #     copymanga_download(mid, mname, "P:\\漫画")
