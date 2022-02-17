@@ -59,14 +59,27 @@ class packer:
         self.logger.error("max retry reached : " + zfp.filename + ":" + name)
         return False
 
+    def checkNeedDownload(self,ch_index,ch_name):#检查是否需要下载 同时删除无用的文件
+        existFiles = [ file for file in os.listdir(self.save_dir) if file.startswith(f"{ch_index:0>4d}_")]
+        # self.logger.info("exist files : "+str(existFiles))
+        pack_name_zip = f"{ch_index:0>4d}_{ch_name}.zip"
+        flag = True
+        for existFile in existFiles:
+            if existFile == pack_name_zip:
+                flag = False
+            else:
+                os.remove(os.path.join(self.save_dir, existFile))
+                self.logger.warning(f"delete {existFile} from {str(existFiles)}")
+        return flag
+
     def downloadCh(
         self, ch_index, ch_name, get_pics, max_workers=8
     ):  # index 记得从1开始
         pack_name = "{:0>4d}_{}".format(ch_index, ch_name)
         pack_tmp_path = os.path.join(self.save_dir, pack_name + ".zip.tmp")
         pack_path = os.path.join(self.save_dir, pack_name + ".zip")
-        if os.path.exists(pack_path):
-            self.logger.warning("passed " + pack_name)
+        if not self.checkNeedDownload(ch_index,ch_name):
+            # self.logger.warning("passed " + pack_name)
             return
         write_lock = threading.Lock()
         urls = get_pics()
@@ -161,12 +174,7 @@ def get_Urls(manga_id, chapter_uid, retry=0):
         assert len(result["results"]["chapter"]["contents"]) == len(
             result["results"]["chapter"]["words"]
         )
-        # for i in range(len(result["results"]["chapter"]["contents"])):
-        #     url = result["results"]["chapter"]["contents"][i]["url"]
-        #     # index = result["results"]["chapter"]["words"][i]
-        #     imgs.append(url)
-
-        imgs = ["" for x in range(len(result["results"]["chapter"]["contents"]))]
+        imgs = [""] * len(result["results"]["chapter"]["contents"])
         for i in range(len(result["results"]["chapter"]["contents"])):
             url = result["results"]["chapter"]["contents"][i]["url"]
             index = int(result["results"]["chapter"]["words"][i])
@@ -188,7 +196,7 @@ def notify_update(mname, update):
 
 def copymanga_download(manga_id, manga_name=None, save_path=r"./"):
     manga_name = manga_id if manga_name == None else manga_name
-    pa = packer(save_path, manga_name, picQuiet=False, notifyer=notify_update)
+    pa = packer(save_path, manga_name, picQuiet=True, notifyer=notify_update)
     for index, ch in enumerate(get_chapters(manga_id)):
         # logger.info(  json.dumps(get_Urls(manga_id, ch["uuid"]),indent=4)  )
         pa.downloadCh(
@@ -198,14 +206,18 @@ def copymanga_download(manga_id, manga_name=None, save_path=r"./"):
         )   
 
 if __name__ == "__main__":
+    # watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
+    # for (mid, mname) in watchList:
+    #     logger.info("Start download " + mid + " " + mname)
+    #     copymanga_download(mid, mname, "/tmp/manga")
+    # open("/tmp/msg", "w", encoding="UTF-8").write(msg) if len(msg) > 0 else None
+
     watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
+    threading.Thread(target=os.system, args=("rclone mount onedrive:Manga P:/Manga --vfs-cache-mode writes",)).start()
+    sleep(3)
     for (mid, mname) in watchList:
         logger.info("Start download " + mid + " " + mname)
-        copymanga_download(mid, mname, "/tmp/manga")
-    open("/tmp/msg", "w", encoding="UTF-8").write(msg) if len(msg) > 0 else None
-
-    # watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
-    # for (mid, mname) in watchList[:1]:
-    #     logger.info("Start download " + mid + " " + mname)
-    #     # copymanga_download(mid, mname, "/tmp/manga")
-    #     copymanga_download(mid, mname, "P:\\漫画")
+        # copymanga_download(mid, mname, "/tmp/manga")
+        copymanga_download(mid, mname, "P:\\Manga")
+    logger.info("Finish")
+    exit(0)
