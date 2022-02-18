@@ -210,7 +210,7 @@ if __name__ == "__main__":
     for (mid, mname) in watchList:
         logger.info("Start download " + mid + " " + mname)
         copymanga_download(mid, mname, "/tmp/manga")
-    open("/tmp/msg", "w", encoding="UTF-8").write(msg) if len(msg) > 0 else None
+    open("/tmp/msg", "w", encoding="UTF-8").write(msg) if msg != "====================" else None
 
     # watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
     # threading.Thread(target=os.system, args=("rclone mount onedrive:Manga P:/Manga --vfs-cache-mode writes",)).start()
