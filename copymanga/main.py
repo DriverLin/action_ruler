@@ -188,7 +188,7 @@ def get_Urls(manga_id, chapter_uid, retry=0):
         return get_Urls(manga_id, chapter_uid, retry + 1)
 
 
-msg = "漫画更新提示:"
+msg = "===================="
 
 def notify_update(mname, update):
     global msg
