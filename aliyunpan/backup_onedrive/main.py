@@ -66,7 +66,7 @@ def rcloneExecutor(cmd, logger):
         res = os.popen("rclone rc core/stats").read()
         try:
             state = json.loads(res)
-            logger.info(json.dumps(state, indent=None))
+            #logger.info(json.dumps(state, indent=None))
             speed = int(state["speed"] / 1048576 * 100) / 100#MB/S
             transfered = int(state["bytes"] / 1048576 * 100) / 100#MB
             usedTime = str(int(state["elapsedTime"]/60)) +"min "+ str(int(state["elapsedTime"])%60) +"s"    #min
