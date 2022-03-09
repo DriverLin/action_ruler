@@ -102,8 +102,8 @@ try:
         time.sleep(1)
     # os.system("chmod 777 ./rclone")
     msg = rcloneExecutor(
-        "rclone --config ./rclone.conf copy onedrive2: aliyunenc: --rc", logger
-        # "rclone --config ./rclone.conf copy onedrive:Manga aliyun:Manga --rc", logger
+       # "rclone --config ./rclone.conf copy onedrive2: aliyunenc: --rc", logger
+        "rclone --config ./rclone.conf copy onedrive:Manga aliyun:Manga --rc", logger
     )
     logger.info("all done!")
 
