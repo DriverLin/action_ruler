@@ -69,7 +69,7 @@ def rcloneExecutor(cmd, logger):
             logger.info(json.dumps(state, indent=None))
             speed = int(state["speed"] / 1048576 * 100) / 100#MB/S
             transfered = int(state["bytes"] / 1048576 * 100) / 100#MB
-            usedTime = str(int(state["transferTime"]/60)) +"min "+ str(int(state["transferTime"])%60) +"s"    #min
+            usedTime = str(int(state["elapsedTime"]/60)) +"min "+ str(int(state["elapsedTime"])%60) +"s"    #min
             formatedOutput = "trasnfed {}mb  \t{}  \t{}mb/s".format(transfered, usedTime, speed)
             msg = formatedOutput
             logger.info(formatedOutput)
