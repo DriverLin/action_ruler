@@ -66,13 +66,17 @@ def rcloneExecutor(cmd, logger):
         res = os.popen("rclone rc core/stats").read()
         try:
             state = json.loads(res)
-            #logger.info(json.dumps(state, indent=None))
+
+            logger.info(json.dumps(state, indent=None))
+
             speed = int(state["speed"] / 1048576 * 100) / 100#MB/S
             transfered = int(state["bytes"] / 1048576 * 100) / 100#MB
             usedTime = str(int(state["elapsedTime"]/60)) +"min "+ str(int(state["elapsedTime"])%60) +"s"    #min
             formatedOutput = "trasnfed {}mb  \t{}  \t{}mb/s".format(transfered, usedTime, speed)
             msg = formatedOutput
-            logger.info(formatedOutput)
+
+            # logger.info(formatedOutput)
+
         except Exception as e:
             logger.error(e)
         time.sleep(1)
@@ -106,6 +110,7 @@ try:
         #"rclone --config ./rclone.conf copy onedrive:Manga aliyun:Manga --rc", logger
     )
     logger.info("all done!")
+
 
 
     with open("/tmp/msg", "w",encoding="UTF-8") as f:
