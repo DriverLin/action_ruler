@@ -4,7 +4,8 @@ import os
 import shutil
 import threading
 import zipfile
-from concurrent.futures import ThreadPoolExecutor,wait,as_completed,FIRST_COMPLETED,ALL_COMPLETED
+from concurrent.futures import (ALL_COMPLETED, FIRST_COMPLETED,
+                                ThreadPoolExecutor, as_completed, wait)
 from time import sleep, time
 
 import coloredlogs
@@ -26,7 +27,7 @@ class packer:
         )
         self.logger = log
 
-    def _download(self, url, name, zfp, write_lock):
+    def __download(self, url, name, zfp, write_lock):
         retry = 0
         while retry < 5:
             try:
@@ -90,21 +91,28 @@ class packer:
         with zipfile.ZipFile(
             pack_tmp_path, "w", compression=zipfile.ZIP_DEFLATED
         ) as zfp:
-            excuter = ThreadPoolExecutor(max_workers=max_workers)
             start = time()
+            #==========================================================
+            excuter = ThreadPoolExecutor(max_workers=max_workers)
             all_task = [excuter.submit(
-                    self._download,
+                    self.__download,
                     url,
                     "{:0>8d}.jpg".format(index + 1),
                     zfp,
                     write_lock,
                 )  for index, url in enumerate(urls)]
-            # excuter.shutdown(wait=True)
-            wait (all_task, return_when=ALL_COMPLETED)
-            for future in as_completed (all_task):
+            wait(all_task, return_when=ALL_COMPLETED)
+            for future in as_completed(all_task):
                 data = future.result ()
-                # print (data)
                 success = success and data
+            #==========================================================
+
+            # result = True
+            # for index, url in enumerate(urls):
+            #     result = result and self.__download(url, "{:0>8d}.jpg".format(index + 1), zfp, write_lock)
+            #     sleep(0.3)#慢速模式
+
+            ##===============================================================
             timeUsed = time() - start
             size = sum([zinfo.file_size for zinfo in zfp.filelist]) / 1048576
 
@@ -154,12 +162,15 @@ def get_chapters(manga_id, retry=0):
             ).json()
             for ch in tmp["results"]["list"]:
                 chapters.append(ch)
-        # logger.info(">" * retry + "get_chapters " + manga_id)
+        logger.info(">" * retry + "get_chapters " + manga_id)
         return chapters
     except Exception as e:
-        logger.warning(">" * retry + e.__str__())
+        logger.warning(">" * retry + "get_chapters error:" + e.__str__())
         sleep(1)
-        return get_chapters(manga_id, retry + 1)
+        if retry > 5:
+            return []
+        else:
+            return get_chapters(manga_id, retry + 1)
 
 
 def get_Urls(manga_id, chapter_uid, retry=0):
@@ -197,12 +208,15 @@ def notify_update(mname, update):
 def copymanga_download(manga_id, manga_name=None, save_path=r"./"):
     manga_name = manga_id if manga_name == None else manga_name
     pa = packer(save_path, manga_name, picQuiet=True, notifyer=notify_update)
-    for index, ch in enumerate(get_chapters(manga_id)):
-        # logger.info(  json.dumps(get_Urls(manga_id, ch["uuid"]),indent=4)  )
+    chs = get_chapters(manga_id)
+    if len(chs) == 0:
+        return
+    for index, ch in enumerate(chs):
         pa.downloadCh(
             ch_index=index + 1,
             ch_name=ch["name"],
             get_pics=lambda: get_Urls(manga_id, ch["uuid"]),
+            max_workers=3,
         )   
 
 if __name__ == "__main__":
@@ -212,12 +226,13 @@ if __name__ == "__main__":
         copymanga_download(mid, mname, "/tmp/manga")
     open("/tmp/msg", "w", encoding="UTF-8").write(msg) if msg != "====================" else None
 
-    # watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
-    # threading.Thread(target=os.system, args=("rclone mount onedrive:Manga P:/Manga --vfs-cache-mode writes",)).start()
+    # watchList = json.load(open(r"overed.json", "r", encoding="utf-8"))
+    # # watchList = json.load(open(r"watching.json", "r", encoding="utf-8"))
+    # # threading.Thread(target=os.system, args=("rclone mount onedrive:Manga P:/Manga --vfs-cache-mode writes",)).start()
     # sleep(5)
     # for (mid, mname) in watchList:
     #     logger.info("Start download " + mid + " " + mname)
     #     # copymanga_download(mid, mname, "/tmp/manga")
-    #     copymanga_download(mid, mname, "P:\\Manga")
+    #     copymanga_download(mid, mname, "D:\\Manga")
     # logger.info("Finish")
     # exit(0)
