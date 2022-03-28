@@ -34,11 +34,11 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Setup Java JDK
-        uses: actions/setup-java@v2.5.0
-        with:
-          distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '17'
+      # - name: Setup Java JDK
+      #   uses: actions/setup-java@v2.5.0
+      #   with:
+      #     distribution: 'temurin' # See 'Supported distributions' for available options
+      #     java-version: '17'
           
       - uses: actions/setup-python@v2
         with:
@@ -51,17 +51,17 @@ jobs:
       - name: 安装python包
         run: pip install requests vthread coloredlogs bottle cryptography
 
-      - name: 启动api服务器
-        run: nohup python api_server.py &
+      # - name: 启动api服务器
+      #   run: nohup python api_server.py &
 
-      - name: 启动aliyunwebdav
-        env:
-          KEY: ${{secrets.KEY}}
-        run: |
-          wget --post-data '{"key": "'$KEY'"}' http://127.0.0.1:8088/api/getRefreshToken -O /tmp/refreshtoken.bin
-          wget  http://127.0.0.1:8088/api/aliyunwebdav/latest/url -O /tmp/aliyundavURL
-          wget `cat /tmp/aliyundavURL` -q -O /tmp/aliyunwebdav.jar
-          nohup java -jar /tmp/aliyunwebdav.jar --aliyundrive.refresh-token=`cat /tmp/refreshtoken.bin` --server.port=8900 --aliyundrive.auth.enable=false > /dev/null &
+      # - name: 启动aliyunwebdav
+      #   env:
+      #     KEY: ${{secrets.KEY}}
+      #   run: |
+      #     wget --post-data '{"key": "'$KEY'"}' http://127.0.0.1:8088/api/getRefreshToken -O /tmp/refreshtoken.bin
+      #     wget  http://127.0.0.1:8088/api/aliyunwebdav/latest/url -O /tmp/aliyundavURL
+      #     wget `cat /tmp/aliyundavURL` -q -O /tmp/aliyunwebdav.jar
+      #     nohup java -jar /tmp/aliyunwebdav.jar --aliyundrive.refresh-token=`cat /tmp/refreshtoken.bin` --server.port=8900 --aliyundrive.auth.enable=false > /dev/null &
 
       - name: 挂载onedrive到/mnt/Manga
         env: 
@@ -78,11 +78,11 @@ jobs:
         run: python main.py
         working-directory: ./copymanga
 
-      - name: 同步到阿里云
-        env:
-          KEY: ${{secrets.KEY}}
-          RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
-        run: rclone --config ./rclone.conf sync onedrive:Manga aliyun:Manga
+      # - name: 同步到阿里云
+      #   env:
+      #     KEY: ${{secrets.KEY}}
+      #     RCLONE_CONFIG_PASS: ${{secrets.RCLONE_CONFIG_PASS}}
+      #   run: rclone --config ./rclone.conf sync onedrive:Manga aliyun:Manga
 
       - name: report
         env:

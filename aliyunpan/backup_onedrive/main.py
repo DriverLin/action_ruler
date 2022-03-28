@@ -1,15 +1,16 @@
 #!/usr/bin/python -u
-import subprocess
-import requests
-import json
-from cryptography.fernet import Fernet
 import base64
-import os
 import hashlib
+import json
+import logging
+import os
+import subprocess
 import threading
 import time
+
 import coloredlogs
-import logging
+import requests
+from cryptography.fernet import Fernet
 
 
 def getLogger():
@@ -110,14 +111,8 @@ try:
         #"rclone --config ./rclone.conf copy onedrive:Manga aliyun:Manga --rc", logger
     )
     logger.info("all done!")
-
-
-
     with open("/tmp/msg", "w",encoding="UTF-8") as f:
         f.write(msg)
-
-
 except Exception as e:
     logger.error(e.__str__())
-
 exit()
