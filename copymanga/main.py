@@ -146,7 +146,7 @@ logger = getLogger()
 def get_chapters(manga_id, retry=0):
     try:
         first = requests.get(
-            "https://api.copymanga.com/api/v3/comic/{}/group/default/chapters?limit=100&offset=0&platform=3".format(
+            "https://api.copymanga.net/api/v3/comic/{}/group/default/chapters?limit=100&offset=0&platform=3".format(
                 manga_id
             ),
             timeout=10,
@@ -156,7 +156,7 @@ def get_chapters(manga_id, retry=0):
         for i in range(int(total / 100)):
             offset = (i + 1) * 100
             tmp = requests.get(
-                "https://api.copymanga.com/api/v3/comic/{}/group/default/chapters?limit=100&offset={}&platform=3".format(
+                "https://api.copymanga.net/api/v3/comic/{}/group/default/chapters?limit=100&offset={}&platform=3".format(
                     manga_id, offset
                 )
             ).json()
@@ -177,7 +177,7 @@ def get_Urls(manga_id, chapter_uid, retry=0):
     # 这里可以考虑下持久化 在下载连载中的时候减少读取时间
     try:
         result = requests.get(
-            "https://api.copymanga.com/api/v3/comic/{}/chapter2/{}?platform=3".format(
+            "https://api.copymanga.net/api/v3/comic/{}/chapter2/{}?platform=3".format(
                 manga_id, chapter_uid
             ),
             timeout=10,
